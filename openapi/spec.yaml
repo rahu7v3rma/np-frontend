@@ -1,0 +1,1813 @@
+openapi: 3.0.0
+info:
+  title: NP Backend OpenAPI spec
+  version: 0.1.0
+components:
+  schemas:
+    error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Error details
+        code:
+          type: string
+        message:
+          type: string
+        status:
+          type: integer
+        data:
+          type: object
+    flaskError:
+      type: object
+      properties:
+        status:
+          type: string
+        error:
+          type: string
+  securitySchemes:
+    auth_key:
+      name: X-Authorization
+      type: apiKey
+      in: header
+      description: ''
+paths:
+  '/campaign/{campaign_code}/login':
+    post:
+      summary: Campaign login
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Email for login attempt
+                phone_number:
+                  type: string
+                  description: Phone number for login attempt
+                auth_id:
+                  type: string
+                  description: Authentication ID for login attempt
+                otp:
+                  type: string
+                  description: One-time password for login attempt
+      responses:
+        '200':
+          description: Credentials are correct
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      email:
+                        type: string
+                      auth_token:
+                        type: string
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: User logged in successfully.
+                    status: 200
+                    data:
+                      username: user1
+                      first_name: Some
+                      last_name: Name
+                      email: user1@example.example
+                      auth_token: abcd1234
+        '400':
+          description: Request is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: request_invalid
+                    message: Request is invalid.
+                    status: 400
+                    data: {}
+        401':
+        description: Bad credentials
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/error'
+            examples:
+              bad_credentials:
+                value:
+                  success: false
+                  code: bad_credentials
+                  message: Bad credentials.
+                  status: 401
+                  data: {}
+              bad_otp:
+                value:
+                  success: false
+                  code: bad_otp
+                  message: Bad OTP code.
+                  status: 401
+                  data: {}
+              missing_otp:
+                value:
+                  success: false
+                  code: missing_otp
+                  message: Missing OTP code.
+                  status: 401
+                  data: {}
+      description: Log in as a campaign employee
+
+  '/campaign/{campaign_code}/details':
+    get:
+      summary: Get Campaign Details
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Language for campaign details (optional)
+          required: false
+          schema:
+            type: string
+            default: "en"
+      responses:
+        '200':
+          description: Campaign details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      code:
+                        type: string
+                      is_active:
+                        type: boolean
+                      organization_name:
+                        type: string
+                      organization_logo_image:
+                        type: string
+                      login_page_title:
+                        type: string
+                      login_page_subtitle:
+                        type: string
+                      main_page_first_banner_title:
+                        type: string
+                      main_page_first_banner_subtitle:
+                        type: string
+                      main_page_first_banner_image:
+                        type: string
+                      main_page_first_banner_mobile_image:
+                        type: string
+                      main_page_second_banner_title:
+                        type: string
+                      main_page_second_banner_subtitle:
+                        type: string
+                      main_page_second_banner_background_color:
+                        type: string
+                      main_page_second_banner_text_color:
+                        type: string
+                      delivery_location:
+                        type: string
+                      office_delivery_address:
+                        type: string
+                      product_selection_mode:
+                        type: string
+                      displayed_currency:
+                        type: string
+                      budget_per_employee:
+                        type: integer
+                      employee_order_reference:
+                        type: integer
+                      employee_name:
+                        type: string
+              examples:
+                en:
+                  value:
+                    success: true
+                    message: Campaign_data fetched successfully
+                    status: 200
+                    data:
+                      name: Happy Holiday
+                      code: "89898"
+                      is_active: true
+                      organization_name: Organization 1
+                      organization_logo_image: /image/open/orgs/1.png
+                      login_page_title: Welcome to the employee site
+                      login_page_subtitle: Log in now to pick your gift!
+                      main_page_first_banner_title: מועצה אזורית תמר מאחלת חג שמח ושנה טובה
+                      main_page_first_banner_subtitle: Happy happy
+                      main_page_first_banner_image: /image/open/banners/1.png
+                      main_page_first_banner_mobile_image: /image/open/banners/1_mobile.png
+                      main_page_second_banner_title: Still happy?
+                      main_page_second_banner_subtitle: Happy happy!
+                      main_page_second_banner_background_color: "#C1E0CE"
+                      main_page_second_banner_text_color: WHITE
+                      delivery_location: ToOffice
+                      office_delivery_address: "Jail road 352, 45, Lahore"
+                      product_selection_mode: MULTIPLE
+                      displayed_currency: COINS
+                      budget_per_employee: 2000
+                      employee_order_reference: null
+                      employee_name: First Last
+                      login_page_image: /login.png
+                      login_page_mobile_image: /login.png
+                he:
+                  value:
+                    success: true
+                    message: Campaign_data fetched successfully
+                    status: 200
+                    data:
+                      name: חג שמח
+                      code: "89898"
+                      is_active: true
+                      organization_name: ארגון 1
+                      organization_logo_image: /image/open/orgs/1.png
+                      login_page_title: היי ברוך הבא
+                      login_page_subtitle: אתר המתנות שלך לחג הקרוב
+                      main_page_first_banner_title: חג שמח!
+                      main_page_first_banner_subtitle: שמח שמח
+                      main_page_first_banner_image: /image/open/banners/1.png
+                      main_page_first_banner_mobile_image: /image/open/banners/1_mobile.png
+                      main_page_second_banner_title: עדיין שמח?
+                      main_page_second_banner_subtitle: שמח שמח!
+                      main_page_second_banner_background_color: "#C1E0CE"
+                      main_page_second_banner_text_color: WHITE
+                      delivery_location: ToHome
+                      office_delivery_address: null
+                      product_selection_mode: SINGLE
+                      displayed_currency: COINS
+                      budget_per_employee: 2000
+                      employee_order_reference: null
+                      employee_name: פרטי משפחה
+                      login_page_image: /login.png
+                      login_page_mobile_image: /login.png
+        '404':
+          description: Campaign does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Campaign does not exist.
+                    status: 404
+                    data: {}
+
+  '/campaign/{campaign_code}/categories':
+    get:
+      summary: Get Campaign Categories
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Campaign categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  code:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      categories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            name:
+                              type: string
+                            image:
+                              type: string
+                            imageWidth:
+                              type: number
+                            imageHeight:
+                              type: number
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Categories fetched successfully.
+                    code: categories_fetched
+                    status: 200
+                    data:
+                      categories:
+                        - id: 1
+                          name: "Gadgets"
+                          image: "gadgets-icon.svg"
+                          imageWidth: 27
+                          imageHeight: 34
+                        - id: 2
+                          name: "Gadgets"
+                          image: "gadgets-icon.svg"
+                          imageWidth: 27
+                          imageHeight: 34
+                        - id: 3
+                          name: "Gadgets"
+                          image: "gadgets-icon.svg"
+                          imageWidth: 27
+                          imageHeight: 34
+                        - id: 4
+                          name: 'Camping'
+                          image: 'camping-icon.svg'
+                          imageWidth: 35
+                          imageHeight: 35
+                        - id: 5
+                          name: 'Garden'
+                          image: 'garden-icon.svg'
+                          imageWidth: 37
+                          imageHeight: 39
+                        - id: 6
+                          name: 'Home Appliance'
+                          image: 'home-appliance-icon.svg'
+                          imageWidth: 32
+                          imageHeight: 32
+                        - id: 7
+                          name: 'Home Decor'
+                          image: 'home-decor-icon.svg'
+                          imageWidth: 41.25
+                          imageHeight: 31.64
+                        - id: 8
+                          name: 'Home Decor'
+                          image: 'home-decor-icon.svg'
+                          imageWidth: 41.25
+                          imageHeight: 31.64
+                        - id: 9
+                          name: 'Home Decor'
+                          image: 'home-decor-icon.svg'
+                          imageWidth: 41.25
+                          imageHeight: 31.64
+                        - id: 10
+                          name: 'Home Decor'
+                          image: 'home-decor-icon.svg'
+                          imageWidth: 41.25
+                          imageHeight: 31.64
+                        - id: 11
+                          name: 'Home Decor'
+                          image: 'home-decor-icon.svg'
+                          imageWidth: 41.25
+                          imageHeight: 31.64
+                        - id: 12
+                          name: 'Home Decor'
+                          image: 'home-decor-icon.svg'
+                          imageWidth: 41.25
+                          imageHeight: 31.64
+                        - id: 13
+                          name: 'Home Decor'
+                          image: 'home-decor-icon.svg'
+                          imageWidth: 41.25
+                          imageHeight: 31.64
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: categories_not_found
+                    message: Categories not found.
+                    status: 404
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    code: authentication_failed
+                    detail: Authentication credentials were not provided.
+        '400':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: request_invalid
+                    message: Request is invalid.
+                    status: 400
+                    data: {}
+      description: Retrieve campaign categories
+
+  '/campaign/{campaign_code}/products':
+    get:
+      summary: Get Campaign Products
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          description: Filter products by category
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: limit for products
+          required: false
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of products per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: q
+          in: query
+          description: Search query string
+          required: false
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Language for product details (optional)
+          required: false
+          schema:
+            type: string
+            default: "en"
+        - name: original_budget
+          in: query
+          description: Filter products by original budget (1 for true, 0 for false)
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Campaign products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      page_num:
+                        type: integer
+                      has_more:
+                        type: boolean
+                      total_count:
+                        type: integer
+                      in_budget_count:
+                        type: integer
+                      page_data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            description:
+                              type: string
+                            sku:
+                              type: string
+                            link:
+                              type: string
+                            technical_details:
+                              type: string
+                            warranty:
+                              type: string
+                            exchange_value:
+                              type: integer
+                            exchange_policy:
+                              type: string
+                            calculated_price:
+                              type: integer
+                            extra_price:
+                              type: integer
+                            supplier:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                            brand:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                logo_image:
+                                  type: string
+                            images:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  main:
+                                    type: boolean
+                                  image:
+                                    type: string
+                            categories:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                  name:
+                                    type: string
+                                  icon_image:
+                                    type: string
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Campaign products fetched successfully.
+                    status: 200
+                    data:
+                      page_num: 1
+                      has_more: false
+                      total_count: 2
+                      in_budget_count: 0
+                      page_data:
+                        - id: 1
+                          name: Product 1
+                          description: Description of Product 1
+                          sku: "111111"
+                          link: ""
+                          technical_details: Technical details of Product 1
+                          warranty: 1 year under conditions X and Y
+                          exchange_value: 0
+                          exchange_policy: ""
+                          calculated_price: 65
+                          extra_price: 55
+                          supplier:
+                            name: Supplier 1
+                          brand:
+                            name: Brand 1
+                            logo_image: /image/open/brands/1.png
+                          images:
+                            - main: true
+                              image: /image/open/products/1_1.png
+                            - main: false
+                              image: /image/open/products/1_2.png
+                          categories:
+                            - id: 1
+                              name: Category A
+                              icon_image: /image/open/categories/a.png
+                          tags:
+                            - name: Tag A
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /image/open/products/2_1.png
+                            - main: false
+                              image: /image/open/products/2_2.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+        '404':
+          description: Campaign not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Campaign not found.
+                    status: 404
+                    data: {}
+        '400':
+          description: Products not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: request_is_invalid
+                    message: Request is invalid.
+                    status: 400
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: unauthorized
+                    message: Unauthorized request.
+                    status: 401
+                    data: {}
+      description: Retrieve campaign products (paginated filterable by categories searchable)
+  '/campaign/{campaign_code}/product/{product_id}/details':
+    get:
+      summary: Get Product Details
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: product_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Language for campaign details (optional)
+          required: false
+          schema:
+            type: string
+            default: "en"
+      responses:
+        '200':
+          description: Product data fetched successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      description:
+                        type: string
+                      sku:
+                        type: string
+                      link:
+                        type: string
+                      technical_details:
+                        type: string
+                      warranty:
+                        type: string
+                      exchange_value:
+                        type: integer
+                      exchange_policy:
+                        type: string
+                      calculated_price:
+                        type: integer
+                      extra_price:
+                        type: integer
+                      supplier:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                      brand:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          logo_image:
+                            type: string
+                      images:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            main:
+                              type: boolean
+                            image:
+                              type: string
+                      categories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            icon_image:
+                              type: string
+                      product_type: string
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: "Product data fetched successfully."
+                    status: 200
+                    data: 
+                      id: 1
+                      name: Product 1
+                      description: Description of Product 1
+                      sku: "111111"
+                      link: ""
+                      technical_details: Technical details of Product 1
+                      warranty: 1 year under conditions X and Y
+                      exchange_value: 0
+                      exchange_policy: ""
+                      calculated_price: 65
+                      extra_price: 55
+                      supplier:
+                        name: Supplier 1
+                      brand:
+                        name: Brand 1
+                        logo_image: /image/open/brands/1.png
+                      images:
+                        - main: true
+                          image: /image/open/products/1_1.png
+                        - main: false
+                          image: /image/open/products/1_2.png
+                      categories:
+                        - id: 1
+                          name: Category A
+                          icon_image: /image/open/categories/a.png
+                      product_type: SENT_BY_SUPPLIER
+        '404':
+          description: Product does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Product does not exist.
+                    status: 404
+                    data: {}
+
+  '/campaign/{campaign_code}/products/images/{image_id}':
+    get:
+      summary: Get Uploaded Image in Specific Size
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: image_id
+          in: path
+          description: ID of the image to retrieve
+          required: true
+          schema:
+            type: integer
+        - name: width
+          in: query
+          description: Width of the image
+          required: true
+          schema:
+            type: integer
+        - name: height
+          in: query
+          description: Height of the image
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Image retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: string
+                    description: URL of the resized image
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Image retrieved successfully
+                    status: 200
+                    data: https://example.com/image12345_resized.jpg
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: resource_not_found
+                    message: Resource not found.
+                    status: 404
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: unauthorized
+                    message: Unauthorized request.
+                    status: 401
+                    data: {}
+
+  '/campaign/{campaign_code}/employee/status':
+    get:
+      summary: Get Employee Campaign Status
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Employee campaign status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      campaign_active:
+                        type: boolean
+                      current_cart_status:
+                        type: string
+                      order_status:
+                        type: string
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: carts orders fetched successfullly
+                    status: 200
+                    data:
+                      current_cart: "In Progress"
+                      orders: 3434
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Campaign not found.
+                    status: 404
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: unauthorized
+                    message: Unauthorized request.
+                    status: 401
+                    data: {}
+
+  '/campaign/{campaign_code}/order':
+    post:
+      summary: Make Order
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                  description: ID of the product to order
+                quantity:
+                  type: integer
+                  description: Quantity of the product to order
+      responses:
+        '200':
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      order_id:
+                        type: integer
+                      quantity:
+                        type: integer
+                      reference:
+                        type: integer
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Order placed successfully
+                    status: 200
+                    data:
+                      reference: 12345
+        '400':
+          description: Request is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: request_invalid
+                    message: Request is invalid.
+                    status: 400
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: bad_credentials
+                    message: Bad credentials.
+                    status: 401
+                    data: {}
+        '402':
+          description: order payment required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Order payment required.
+                    status: 402
+                    data: 
+                      payment_url: www.payment.com
+
+        '500':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: unauthorized
+                    message: Unknown error occured.
+                    status: 500
+                    data: {}
+
+  '/campaign/{campaign_code}/order/details':
+    get:
+      summary: Get existing order details
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      reference:
+                        type: integer
+                      order_date_time:
+                        type: string
+                      added_payment:
+                        type: boolean
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Employee order fetched successfully.
+                    status: 200
+                    data:
+                      reference: 12345
+                      order_date_time: "2024-08-01T12:00:00.000000Z"
+                      added_payment: true
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: bad_credentials
+                    message: Bad credentials.
+                    status: 401
+                    data: {}
+        '404':
+          description: Existing order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Order not found.
+                    code: not_found
+                    status: 404
+                    data: {}
+
+  '/campaign/{campaign_code}/cancel/order/{order_id}':
+    put:
+      summary: Cancel Order
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: order_id
+          in: path
+          description: ID of the order to cancel
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Order cancelled successfully
+                    status: 200
+                    data: {}
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Order not found.
+                    status: 404
+                    data: {}
+        '400':
+          description: Request is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: request_invalid
+                    message: Request is invalid.
+                    status: 400
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: unauthorized
+                    message: Unauthorized request.
+                    status: 401
+                    data: {}
+      description: Cancel an order
+  '/image/open/{imagePrefix}/{imagePath}':
+    parameters:
+      - schema:
+          type: string
+        name: imagePrefix
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: imagePath
+        in: path
+        required: true
+    get:
+      summary: ''
+      operationId: get-image
+      responses:
+        '302':
+          description: Moved Temporarily
+          headers:
+            Location:
+              schema:
+                type: string
+                example: 'https://app.caas.ai/bee_icon.jpg'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                example:
+                  value: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/flaskError'
+              examples:
+                example:
+                  value:
+                    status: error
+                    error: not_found
+  '/image/open/{imagePrefix}/{imagePath}/r/{imageWidth}/{imageHeight}/scale':
+    parameters:
+      - schema:
+          type: string
+        name: imagePrefix
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: imagePath
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: imageWidth
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: imageHeight
+        in: path
+        required: true
+    get:
+      summary: ''
+      operationId: get-image
+      responses:
+        '302':
+          description: Moved Temporarily
+          headers:
+            Location:
+              schema:
+                type: string
+                example: 'https://app.caas.ai/bee_icon.jpg'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+              examples:
+                example:
+                  value: {}
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/flaskError'
+              examples:
+                example:
+                  value:
+                    status: error
+                    error: not_found
+  '/payment/create-payment/{product_id}':
+    post:
+      summary: Create Payment
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  description: The amount to be paid.
+                  example: 100.00
+                lang:
+                  type: string
+                  description: Language for the payment form.
+                  example: "en"
+                # Add other fields as per the PaymentInformationSerializer
+      responses:
+        '200':
+          description: Payment URL retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  code:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: URL found
+                    code: url_found
+                    status: 200
+                    data:
+                      url: "https://sandbox.meshulam.co.il/credit-checkout-form?l=0f5e257e3219de76b51f43abbb64a976%NDk4ODIx"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  code:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Bad Request
+                    code: bad_request
+                    status: 400
+                    data: { }
+        '404':
+          description: Product Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  code:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Product does not exist.
+                    code: not_found
+                    status: 404
+                    data: { }
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  code:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Unknown error occured
+                    code: internal_server_error
+                    status: 500
+                    data: { }
+
+  '/campaign/{campaign-code}/order':
+    get:
+      summary: Get Order Information
+      responses:
+        '200':
+          description: Order Information successfully fetched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      order_found:
+                        type: boolean
+                      order_id:
+                        type: integer
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Order Placed successfully
+                    status: 200
+                    data: {
+                      order_found: true,
+                      order_id: 1,
+                  }
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Bad Request
+                    status: 400
+                    data: {}
+        '404':
+          description: Cart Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+              examples:
+                cartNotFound:
+                  value:
+                    success: false
+                    message: Cart not found.
+                    code: not_found
+                    status: 404
+                    data: {}
+
+  '/campaign/{campaign-code}/cart/add_product':
+    post:
+      summary: Add product to cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                quantity:
+                  type: integer
+              required:
+                - product_id
+                - quantity
+            examples:
+              example:
+                value:
+                  product_id: 123
+                  quantity: 2
+      responses:
+        '200':
+          description: Product Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      cart_id:
+                        type: integer
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Cart updated successfully.
+                    status: 200
+                    data:
+                      cart_id: 1
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Request is invalid
+                    code: request_invalid
+                    status: 400
+                    data: {}
+        '401':
+          description: Product Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Bad credentials.
+                    code: bad_credentials
+                    status: 401
+                    data: {}
+
+  '/campaign/{campaign_code}/cart/products':
+    get:
+      summary: Get Campaign Details
+      parameters:
+        - name: language
+          in: query
+          description: Language for cart details (optional)
+          required: false
+          schema:
+            type: string
+            default: "en"
+      responses:
+        '200':
+          description: Cart fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      products:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            product:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                name:
+                                  type: string
+                                description:
+                                  type: string
+                                sku:
+                                  type: string
+                                link:
+                                  type: string
+                                technical_details:
+                                  type: string
+                                warranty:
+                                  type: string
+                                exchange_value:
+                                  type: number
+                                exchange_policy:
+                                  type: string
+                                brand:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    logo_image:
+                                      type: string
+                                supplier:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                images:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      main:
+                                        type: boolean
+                                      image:
+                                        type: string
+                                categories:
+                                  type: array
+                                  items:
+                                    type: string
+                                calculated_price:
+                                  type: number
+                                extra_price:
+                                  type: number
+                            quantity:
+                              type: integer
+              examples:
+                en:
+                  value:
+                    success: true
+                    message: Cart fetched successfully
+                    status: 200
+                    data:
+                      products:
+                        - id: 1
+                          product:
+                            id: 1
+                            name: 'product name en 1'
+                            description: 'description 1'
+                            sku: 'sku 1'
+                            link: ''
+                            technical_details: ''
+                            warranty: ''
+                            exchange_value: null
+                            exchange_policy: ''
+                            brand:
+                              name: 'brand name en 1'
+                              logo_image: null
+                            supplier:
+                              name: 'supplier name en 1'
+                            images:
+                              - main: true
+                                image: '/media/abc.jpeg'
+                            categories: []
+                            calculated_price: 10
+                            extra_price: 9
+                          quantity: 1
+                        - id: 2
+                          product:
+                            id: 2
+                            name: 'product name en 2'
+                            description: 'description 1'
+                            sku: 'sku 2'
+                            link: ''
+                            technical_details: ''
+                            warranty: ''
+                            exchange_value: null
+                            exchange_policy: ''
+                            brand:
+                              name: 'brand name en 1'
+                              logo_image: null
+                            supplier:
+                              name: 'supplier name en 1'
+                            images: []
+                            categories: []
+                            calculated_price: 1
+                            extra_price: 0
+                          quantity: 0
+        '404':
+          description: Cart not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Not found.
+                    status: 404

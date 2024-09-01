@@ -1,0 +1,11 @@
+{
+  "name": "spec",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "start": "prism mock -p 8000 ./spec.yaml"
+  },
+  "dependencies": {
+    "@stoplight/prism-cli": "^5.7.0"
+  }
+}

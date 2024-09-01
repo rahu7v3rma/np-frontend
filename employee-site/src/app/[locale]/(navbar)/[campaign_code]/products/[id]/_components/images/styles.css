@@ -1,0 +1,31 @@
+.childSwiper {
+  padding: 0 .5rem;
+}
+
+.childSwiper .swiper-slide {
+  opacity: 0.4;
+  height: 5rem;
+  width: 5rem !important;
+  border: 1px solid #363839;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 64px !important; /* Set your desired width */
+  height: 64px;
+}
+
+.childSwiper .swiper-slide:hover {
+  border: 1px solid #363839;
+  opacity: 1;
+}
+
+.childSwiper .swiper-slide-thumb-active {
+  opacity: 1;
+  border: 2px solid #363839 !important;
+  border-radius: 8px;
+}
+
+@media screen and (min-width: 640px) {
+  .childSwiper {
+    margin: 2rem 4rem ;
+  }
+}

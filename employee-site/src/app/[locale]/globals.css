@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.overflow-x-auto::-webkit-scrollbar {
+  display: none;
+}
+
+.overflow-x-auto {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.ellipsis-multiline-base {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ellipsis-multiline-second {
+  -webkit-line-clamp: 2;
+}
+
+@layer utilities {
+  .category-selected-svg {
+    filter: invert(17%) sepia(11%) saturate(190%) hue-rotate(155deg) brightness(99%) contrast(85%);
+  }
+
+  .category-default-svg {
+    filter: invert(58%) sepia(9%) saturate(55%) hue-rotate(169deg) brightness(90%) contrast(88%);
+  }
+}
+
+.search-select-custom div div {
+  height: 50px !important;
+}
