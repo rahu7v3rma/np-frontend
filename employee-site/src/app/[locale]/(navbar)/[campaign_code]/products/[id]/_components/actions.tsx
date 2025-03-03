@@ -1,22 +1,38 @@
 'use client';
 
-import { Button } from '@nextui-org/react';
-import { usePathname, useParams, useRouter } from 'next/navigation';
-import React, {
+import {
+  Accordion,
+  AccordionItem,
+  Button,
+  Divider,
+  Modal,
+  ModalContent,
+  Select,
+  SelectItem,
+  useDisclosure,
+} from '@nextui-org/react';
+import clsx from 'clsx';
+import Image from 'next/image';
+import { useParams, usePathname, useRouter } from 'next/navigation';
+import {
+  Dispatch,
   FunctionComponent,
-  useContext,
+  SetStateAction,
   useCallback,
-  useMemo,
+  useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import { RiAlertFill } from 'react-icons/ri';
-import { toast } from 'react-toastify';
 
 import SharePopover from '@/app/[locale]/(navbar)/_components/sharePopover';
+import Swatch from '@/app/[locale]/(navbar)/_components/swatch';
 import { CampaignContext } from '@/app/[locale]/context/campaign';
 import { CartContext } from '@/app/[locale]/context/cart';
-import { useI18n } from '@/locales/client';
+import { useCurrentLocale, useI18n } from '@/locales/client';
+import MultiSelectPrice from '@/shared/MultiSelectPrice';
+import { ProductImage, ProductKind, Variation } from '@/types/product';
 
 type Props = {
   productName: string;
@@ -25,7 +41,17 @@ type Props = {
   description: string;
   orderFound: boolean;
   productId?: number;
-  quantity?: number;
+  quantity: number;
+  isProductOutOfStock: boolean;
+  calculatedPrice: number | undefined;
+  isButtonDisable: boolean;
+  specialOffer: string;
+  variations: Variation[];
+  productImages: ProductImage[];
+  setProductImages: Dispatch<SetStateAction<ProductImage[]>>;
+  productKind?: ProductKind;
+  voucherValue?: number;
+  productLink?: string;
 };
 
 const Actions: FunctionComponent<Props> = ({
@@ -36,24 +62,54 @@ const Actions: FunctionComponent<Props> = ({
   orderFound,
   productId,
   quantity,
+  isProductOutOfStock = false,
+  calculatedPrice,
+  isButtonDisable = false,
+  specialOffer,
+  variations,
+  productImages,
+  setProductImages,
+  productKind,
+  voucherValue,
+  productLink,
 }: Props) => {
   const t = useI18n();
-  const { id } = useParams<{
-    id: string;
-  }>();
+  const currentLocale = useCurrentLocale();
+
   const currentPath = usePathname();
   const router = useRouter();
 
-  const { campaignDetails } = useContext(CampaignContext);
-  const { addCartItem } = useContext(CartContext);
+  const { campaignDetails, campaignType } = useContext(CampaignContext);
+  const { addCartItem, showCart, showList } = useContext(CartContext);
   const [shareLink, setShareLink] = useState('');
 
+  const [selectedColorVariation, setSelectedColorVariation] = useState<{
+    [key: string]: { color_code: any; site_name: any; name: any };
+  }>({});
+  const [selectedTextVariations, setSelectedTextVariations] = useState<{
+    [key: string]: { site_name: string; name: string } | any;
+  }>({});
+
+  const {
+    isOpen: isVoucherDetailsModalOpen,
+    onOpen: onVoucherDetailsModalOpen,
+    onOpenChange: onVoucherDetailsModalOpenChange,
+  } = useDisclosure();
+
+  const selectedvariationCount = useCallback(() => {
+    const colorCount = Object.keys(selectedColorVariation).length;
+    const textCount = Object.keys(selectedTextVariations).length;
+    return colorCount + textCount;
+  }, [selectedColorVariation, selectedTextVariations]);
+
+  const { id } = useParams<{
+    id: string;
+  }>();
   useEffect(() => {
     setShareLink(
-      `${window.location.host}/${campaignDetails?.code}/products/${productId}`,
+      `${window.location.host}/${campaignDetails?.code}/product/${id}`,
     );
-  }, [campaignDetails, productId]);
-
+  }, [campaignDetails, id]);
   const checkoutPath = useMemo(() => {
     const checkoutUrl = currentPath.substring(
       0,
@@ -63,83 +119,337 @@ const Actions: FunctionComponent<Props> = ({
     return checkoutUrl;
   }, [currentPath]);
 
-  const handleChooseGiftClick = useCallback(async () => {
-    try {
-      addCartItem && (await addCartItem(productId!!, quantity!!));
+  const addToQuickOfferHandler = useCallback(async () => {
+    const getVariations = () => {
+      const colorVariations = selectedColorVariation
+        ? Object.entries(selectedColorVariation).map(([key, value]) => ({
+            key,
+            name: value.name,
+          }))
+        : [];
 
-      // only show toast if we are actually adding to a cart in multiple
-      // selection
-      if (campaignDetails?.product_selection_mode === 'MULTIPLE') {
-        toast.success(t('cart.itemAdded'));
-      } else {
-        router.push(`${checkoutPath}/checkout?id=${id}`);
+      return [...colorVariations, selectedTextVariations];
+    };
+    const variations = getVariations();
+    const addItemToCart = async () => {
+      if (addCartItem) {
+        const variationsData = variations.length
+          ? Object.fromEntries(variations.map(({ key, name }) => [key, name]))
+          : undefined;
+
+        try {
+          await addCartItem(productId!!, 1, variationsData);
+          showList(true);
+        } catch (error) {
+          console.error('Error adding item to cart:', error);
+        }
       }
-    } catch {
-      // only show toast if we are actually adding to a cart in multiple
-      // selection
-      if (campaignDetails?.product_selection_mode === 'MULTIPLE') {
-        toast.error(t('cart.itemNotAdded'));
+    };
+
+    await addItemToCart();
+  }, [
+    addCartItem,
+    productId,
+    selectedTextVariations,
+    selectedColorVariation,
+    showList,
+  ]);
+
+  const handleChooseGiftClick = useCallback(async () => {
+    if (productId) {
+      try {
+        const variations = {
+          ...Object.fromEntries(
+            Object.entries(selectedColorVariation).map(([key, value]) => [
+              key,
+              value.name,
+            ]),
+          ),
+          ...Object.fromEntries(
+            Object.entries(selectedTextVariations || {}).map(([key, value]) => [
+              key,
+              value,
+            ]),
+          ),
+        };
+
+        await addCartItem?.(
+          productId,
+          quantity,
+          Object.keys(variations).length ? variations : undefined,
+        );
+        showCart(true);
+        if (campaignDetails?.product_selection_mode !== 'MULTIPLE') {
+          router.push(`${checkoutPath}/checkout`);
+        }
+      } catch (error) {
+        console.error('Error adding product to cart:', error);
       }
     }
   }, [
     campaignDetails,
     productId,
     quantity,
-    t,
     addCartItem,
     router,
     checkoutPath,
-    id,
+    showCart,
+    selectedTextVariations,
+    selectedColorVariation,
   ]);
 
+  const handleColorVariationSelect = useCallback(
+    (v: Variation, c: { id: string; bg: string; name: string }) => {
+      const imagesToAdd = v.color_variation
+        .filter((v) => v.image)
+        .map((v) => ({
+          main: false,
+          selected: v.color_code === c.bg,
+          image: v.image,
+        }));
+
+      if (imagesToAdd.length > 0) {
+        setProductImages([...productImages, ...imagesToAdd]);
+      }
+
+      setSelectedColorVariation((prev) => ({
+        ...prev,
+        [v.site_name]: {
+          color_code: c.bg,
+          site_name: v.site_name,
+          name: c.id,
+        },
+      }));
+    },
+    [setProductImages, productImages],
+  );
+
   return (
-    <div className="w-full md:max-w-[442px]">
+    <div className="w-full sm:pt-[24px]">
       <h2 className="font-bold text-xl text-[#363839] leading-[30px]">
         {productName}
       </h2>
-      <div className="flex items-center my-3 gap-4">
-        {!!additionalPrice && (
-          <div className="inline-flex border border-extra-cost-background-2 bg-extra-cost-background-1 rounded-lg">
-            <span className="bg-extra-cost-background-2 text-extra-cost-text-color !text-[13px] font-medium leading-6 flex justify-center items-center px-2 rounded-[7px]">
-              {t('products.additional')}
-            </span>
-            <span className="!text-[15px] font-semibold leading-6 flex justify-center items-center gap-0.5 px-2">
-              {t('currencySymbol')}
-              {additionalPrice}
+      <div className="flex items-center my-3 gap-4 sm:mt-[16px] sm:mb-[8px]">
+        {campaignDetails?.product_selection_mode === 'SINGLE'
+          ? !!additionalPrice && (
+              <div className="inline-flex border border-extra-cost-background-2 bg-extra-cost-background-1 rounded-lg">
+                <span className="bg-extra-cost-background-2 text-extra-cost-text-color !text-[13px] font-medium leading-6 flex justify-center items-center px-2 rounded-[7px]">
+                  {t('products.additional')}
+                </span>
+                <span className="!text-[15px] font-semibold leading-6 flex justify-center items-center gap-0.5 px-2">
+                  {campaignType === 'quick_offer_code'
+                    ? '₪'
+                    : t('currencySymbol')}
+                  {additionalPrice}
+                </span>
+              </div>
+            )
+          : !!calculatedPrice && (
+              <div className="text-[#868788] text-base flex gap-1 items-center">
+                {productKind === 'MONEY' && <p>{t('cart.price')}</p>}
+                <MultiSelectPrice price={calculatedPrice} point />
+              </div>
+            )}
+        {productKind === 'MONEY' ? (
+          <div className="border-[1px] border-[#2B324C] rounded-[8px] text-[13px] text-[#2B324C] font-[500] leading-[18px] h-[24px] flex items-center px-2">
+            {campaignType === 'quick_offer_code'
+              ? t('cart.discount')
+              : t('products.money_value')}{' '}
+            {voucherValue +
+              (campaignDetails?.displayed_currency !== 'POINT'
+                ? campaignType === 'quick_offer_code'
+                  ? t('moneySymbol')
+                  : t('currencySymbol')
+                : '')}
+          </div>
+        ) : (
+          !!exchangeValue && (
+            <div className="border-[1px] border-[#2B324C] rounded-[8px] text-[13px] text-[#2B324C] font-[500] leading-[18px] h-[24px] flex items-center px-2">
+              {t('products.value')}{' '}
+              {campaignType === 'quick_offer_code'
+                ? '₪' + exchangeValue
+                : (campaignDetails?.displayed_currency !== 'POINT'
+                    ? t('currencySymbol')
+                    : '') + exchangeValue}
+            </div>
+          )
+        )}
+        {specialOffer && (
+          <div className="border  bg-[#D0EADB] text-[#566F61] rounded-lg flex justify-center ">
+            <span className="!text-[13px] font-medium leading-6 flex justify-center items-center gap-0.5 px-2 uppercase max-w-[117px]">
+              {specialOffer}
             </span>
           </div>
         )}
-        {!!exchangeValue && (
-          <div className="border border-[#2B324C] rounded-lg px-2 py-[2px] text-[#2B324C] font-medium text-[13px]">
-            {t('products.value')} {t('currencySymbol')}
-            {exchangeValue}
-          </div>
-        )}
       </div>
-      <p className='"font-normal text-sm text-[#868788] leading-[22px] whitespace-pre-wrap'>
-        {description}
-      </p>
-      <div className="border border-dashed border-[#919EAB33] mt-4 mb-4"></div>
-      <div className="flex gap-4">
-        <SharePopover link={shareLink} productName={productName} />
-        <Button
-          color="primary"
-          size="lg"
-          className="w-full lg:w-90 font-bold"
-          onClick={handleChooseGiftClick}
-          isDisabled={orderFound}
-        >
-          {t('button.gift')}
-        </Button>
-      </div>
-      {orderFound && (
-        <div className="text-red-600 text-small mt-5">
-          <div className="flex">
-            <RiAlertFill size="25" style={{ marginTop: '-3px' }} />
-            {t('alreadyChoseProduct')}
-          </div>
+      <div className="">
+        <div className="flex flex-col gap-4 my-4">
+          <Divider className="bg-[#919EAB33]" />
+          {variations
+            ?.filter((v) =>
+              v.variation_kind === 'COLOR'
+                ? v.color_variation.length
+                : v.variation_kind === 'TEXT'
+                  ? v.text_variation.length
+                  : false,
+            )
+            .slice(0, 5)
+            .map((v, i) => (
+              <div key={i} className="flex justify-between items-center">
+                <span className="capitalize text-sm font-semibold">
+                  {v.site_name}
+                </span>
+                {v.variation_kind === 'COLOR' && (
+                  <Swatch
+                    colors={v.color_variation.map((c) => ({
+                      id: c.name,
+                      bg: c.color_code,
+                      name: c.name,
+                    }))}
+                    selectedItem={
+                      selectedColorVariation[v.site_name]
+                        ? {
+                            id: selectedColorVariation[v.site_name].name,
+                            bg: selectedColorVariation[v.site_name].color_code,
+                            name: selectedColorVariation[v.site_name].name,
+                          }
+                        : undefined
+                    }
+                    onSelectionChange={(c) => handleColorVariationSelect(v, c)}
+                  />
+                )}
+                {v.variation_kind === 'TEXT' && (
+                  <Select
+                    className={clsx('custom-border h-[40px] w-[100px]')}
+                    size="sm"
+                    variant="bordered"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSelectedTextVariations((prev) => {
+                        let p = structuredClone(prev);
+                        p = p || {};
+                        if (!val) {
+                          delete p[v.site_name];
+                        } else {
+                          p[v.site_name] = val;
+                        }
+                        return p;
+                      });
+                    }}
+                    aria-label="text-variation"
+                    classNames={{
+                      popoverContent: '[&_li]:w-full',
+                    }}
+                  >
+                    {v.text_variation.map((v) => {
+                      return (
+                        <SelectItem
+                          key={v.text}
+                          textValue={v.text}
+                          className="w-max"
+                        >
+                          {v.text}
+                        </SelectItem>
+                      );
+                    })}
+                  </Select>
+                )}
+              </div>
+            ))}
+          {variations && variations.length > 0 && (
+            <Divider className="bg-[#919EAB33]" />
+          )}
+          <Accordion
+            itemClasses={{
+              trigger: 'py-0',
+              title: 'text-sm font-semibold',
+            }}
+            defaultExpandedKeys={['1']}
+          >
+            <AccordionItem
+              title={t('productDetails.productDetails')}
+              key={variations.length ? undefined : '1'}
+            >
+              <p className="whitespace-pre-wrap mt-4 text-primary-100 text-sm">
+                {description}
+              </p>
+            </AccordionItem>
+          </Accordion>
+          {campaignType === 'campaign_code' && productKind === 'MONEY' && (
+            <Button
+              className="w-[152px] h-[30px] rounded-[8px] bg-[#FA9F56] flex justify-center items-center gap-[8px]"
+              onClick={onVoucherDetailsModalOpen}
+            >
+              <span className="font-[700] text-[13px] leading-[22px] text-white">
+                {t('voucherDetails')}
+              </span>
+              <Image
+                src={'/new-tab.svg'}
+                width={13.5}
+                height={13.5}
+                alt="new-tab"
+                loading="eager"
+              />
+            </Button>
+          )}
+          <Divider className="bg-[#919EAB33]" />
         </div>
-      )}
+        <div className="flex gap-4">
+          {campaignType !== 'quick_offer_code' && (
+            <SharePopover link={shareLink} />
+          )}
+          <Button
+            color="primary"
+            size="lg"
+            className="w-full lg:w-100 font-bold text-sm leading-[22px] whitespace-normal h-12"
+            onClick={
+              campaignType === 'quick_offer_code'
+                ? addToQuickOfferHandler
+                : handleChooseGiftClick
+            }
+            isDisabled={
+              campaignDetails?.campaign_type === 'WALLET'
+                ? isProductOutOfStock ||
+                  selectedvariationCount() !== variations.length ||
+                  isButtonDisable
+                : (campaignType === 'quick_offer_code'
+                    ? isProductOutOfStock
+                    : orderFound || isProductOutOfStock || isButtonDisable) ||
+                  selectedvariationCount() !== variations.length
+            }
+          >
+            {campaignType === 'quick_offer_code'
+              ? t('button.quickGift')
+              : t('button.gift')}
+          </Button>
+        </div>
+        {campaignType === 'quick_offer_code' ||
+        campaignDetails?.campaign_type === 'WALLET'
+          ? ''
+          : orderFound && (
+              <div className="text-red-600 text-small mt-5">
+                <div className="flex">
+                  <RiAlertFill size="25" style={{ marginTop: '-3px' }} />
+                  {t('alreadyChoseProduct')}
+                </div>
+              </div>
+            )}
+        <Modal
+          isOpen={isVoucherDetailsModalOpen}
+          hideCloseButton
+          onOpenChange={onVoucherDetailsModalOpenChange}
+          placement="center"
+          className="h-[80vh] w-[80vw]"
+          size="full"
+          classNames={{
+            base: '!rounded-[16px]',
+          }}
+        >
+          <ModalContent>
+            <iframe src={productLink} height={'100%'} width={'100%'} />
+          </ModalContent>
+        </Modal>
+      </div>
     </div>
   );
 };

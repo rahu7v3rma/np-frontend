@@ -3,13 +3,16 @@
 import { Icon } from '@iconify/react';
 import { Button, Tooltip } from '@nextui-org/react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useContext, useState } from 'react';
 
+import { CampaignContext } from '@/app/[locale]/context/campaign';
 import { useI18n } from '@/locales/client';
 import ConfirmationModal from '@/shared/modal';
 
 type ProductConfirmation = {
   product: any;
+  selectedVariations: any;
   submitDisabled: boolean;
   onCancel: () => void;
   onSubmit: () => void;
@@ -18,11 +21,15 @@ type ProductConfirmation = {
 export default function ProductConfirmationCard({
   product,
   submitDisabled,
+  selectedVariations,
   onCancel,
   onSubmit,
 }: ProductConfirmation) {
   const [isOpen, setIsopen] = useState<boolean>(false);
   const t = useI18n();
+
+  const { campaignDetails } = useContext(CampaignContext);
+  const router = useRouter();
 
   return (
     <>
@@ -30,9 +37,9 @@ export default function ProductConfirmationCard({
         <div className="px-6 py-8 bg-white rounded-xl border border-slate-200 shadow-md shadow-grey-400">
           <div className="flex justify-between items-center">
             <h4 className="text-primary text-lg font-bold">
-              {product?.quantity} {t('common.item')}
+              {product ? '1' : ''} {t('common.item')}
             </h4>
-            <Tooltip color="primary" content="Delete item">
+            <Tooltip color="primary" content={t('order.deleteItem')}>
               <Icon
                 onClick={() => setIsopen(true)}
                 icon="solar:trash-bin-trash-bold"
@@ -43,19 +50,67 @@ export default function ProductConfirmationCard({
             </Tooltip>
           </div>
           <div className="flex gap-4 mt-8">
-            <div className="bg-gray-100 p-4 w-[96px] h-[96px] rounded-lg">
-              {product?.images.length > 0 && (
-                <Image
-                  src={product.images[0].image}
-                  alt={'Product Image'}
-                  width={96}
-                  height={96}
-                />
+            <div>
+              {product && (
+                <>
+                  <div className="flex gap-4 mt-6" key={product?.id}>
+                    <div className="bg-gray-100 p-4 w-[96px] h-[96px] rounded-lg">
+                      {product?.images?.length > 0 && (
+                        <Image
+                          src={product.images[0].image}
+                          className="cursor-pointer"
+                          alt={'Product Image'}
+                          width={96}
+                          height={96}
+                          onClick={() => {
+                            router.push(
+                              `/${campaignDetails?.code}/products/${product.id}`,
+                            );
+                          }}
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <span className="flex font-semibold text-sm mt-1 leading-[22px]"></span>
+                      <p
+                        onClick={() => {
+                          router.push(
+                            `/${campaignDetails?.code}/products/${product.id}`,
+                          );
+                        }}
+                        className="
+                          flex 
+                          text-[#868788] 
+                          font-normal 
+                          text-sm 
+                          leading-[22px] 
+                          ltr:mr-4
+                          rtl:ml-4
+                          cursor-pointer"
+                      >
+                        {product?.name}
+                      </p>
+                      <div className="flex flex-wrap gap-x-2">
+                        {Object.entries(
+                          selectedVariations.variations ?? {},
+                        ).map(([k, v], i) => (
+                          <div
+                            className={`text-xs leading-[18px] flex basis-1/2`}
+                            key={i}
+                          >
+                            <label className="capitalize">{k}:&nbsp;</label>
+                            <label className="text-text-secondary">
+                              {String(v)}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="border-t-1 border-dotted border-[#919EAB33] w-full mt-10 mb-4"></div>
+                </>
               )}
             </div>
-            <p className="flex-1 text-primary-100 font-sm mr-4">
-              {product?.name}
-            </p>
           </div>
           {!!product?.extra_price && (
             <>
@@ -85,7 +140,7 @@ export default function ProductConfirmationCard({
           <Button
             color="primary"
             size="lg"
-            className="w-full"
+            className="w-full font-bold"
             isDisabled={submitDisabled}
             onClick={onSubmit}
           >

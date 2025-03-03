@@ -8,9 +8,14 @@ import { GROW_ENV } from '@/services/common';
 type Props = {
   paymentCode?: string;
   onPaid: () => void;
+  onPaymentClose: () => void;
 };
 
-const Payment: FunctionComponent<Props> = ({ paymentCode, onPaid }: Props) => {
+const Payment: FunctionComponent<Props> = ({
+  paymentCode,
+  onPaid,
+  onPaymentClose,
+}: Props) => {
   // not a callback since growPayment is provided by the loaded external script
   const handleScriptLoad = () => {
     const config = {
@@ -23,7 +28,11 @@ const Payment: FunctionComponent<Props> = ({ paymentCode, onPaid }: Props) => {
         onFailure: (res: any) => {},
         onError: (res: any) => {},
         onTimeout: (res: any) => {},
-        onWalletChange: (res: any) => {},
+        onWalletChange: (res: any) => {
+          if (res === 'close') {
+            onPaymentClose();
+          }
+        },
       },
     };
 

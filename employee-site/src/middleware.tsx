@@ -1,17 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createI18nMiddleware } from 'next-international/middleware';
 
-import { AUTH_KEY } from './utils/const';
+const noLocalePrefix = (
+  locales: readonly string[],
+  pathname: string,
+): boolean => {
+  return locales.every((locale) => {
+    return !(pathname === `/${locale}` || pathname.startsWith(`/${locale}/`));
+  });
+};
+
+const LOCALES = ['en', 'he'];
 
 const I18nMiddleware = createI18nMiddleware({
-  locales: ['en', 'he'],
+  locales: LOCALES,
   defaultLocale: 'he',
-  urlMappingStrategy: 'rewrite',
+  urlMappingStrategy: 'rewriteDefault',
   resolveLocaleFromRequest: (request) => {
     // this determines the language when an uncommitted request (aka the user
     // hasn't set their language yet) arrives and the i18n middleware will by
     // default try to match the locale to the one set on the user's computer.
-    // instead, we just wat the default locale to always be Hebrew
+    // instead, we check if the request path contains any locale and if so
+    // return it, or otherwise default to Hebrew
+    if (!noLocalePrefix(LOCALES, request.nextUrl.pathname)) {
+      const pathnameLocale = request.nextUrl.pathname.split('/', 2)?.[1];
+
+      if (pathnameLocale && LOCALES.indexOf(pathnameLocale) > -1) {
+        return pathnameLocale;
+      }
+    }
+
+    // fallback - default to Hebrew
     return 'he';
   },
 });
@@ -44,8 +63,14 @@ export function middleware(request: NextRequest) {
     /\/*\/[epai]$/,
     // Product route
     /\/.*\/product\/.*$/,
+    // Cart-Details route
+    /^\/.*\/cart-details\/?.*$/,
+    /^\/.*\/list-details\/?.*$/,
   ];
-  if (!campaign_code && ['', '/'].indexOf(pathname) > -1) {
+  if (
+    !campaign_code &&
+    (['', '/'].indexOf(pathname) > -1 || pathname.endsWith('/cart/share'))
+  ) {
     return I18nMiddleware(request);
   }
 

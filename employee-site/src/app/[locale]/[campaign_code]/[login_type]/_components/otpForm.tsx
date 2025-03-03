@@ -10,26 +10,28 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { toast } from 'react-toastify';
 
-import { useCurrentLocale, useI18n } from '@/locales/client';
-import { postLogin } from '@/services/api';
-import { LoginPayload } from '@/types/api';
+import { useI18n } from '@/locales/client';
+import { postLogin, getCampaignType } from '@/services/api';
+import { LoginMethods, LoginPayload } from '@/types/api';
 
 const OTP_DIGITS = 6;
+const RESEND_CODE_SECONDS = 5 * 60;
 
 type Props = {
   organizationName: string;
   loginPayload: LoginPayload;
+  isIOS: boolean;
 };
 
 const OTPForm: FunctionComponent<Props> = ({
   organizationName,
   loginPayload,
+  isIOS,
 }: Props) => {
   const t = useI18n();
-  const locale = useCurrentLocale();
   const router = useRouter();
+  const [timer, setTimer] = useState(RESEND_CODE_SECONDS);
 
   const { campaign_code, login_type } = useParams<{
     campaign_code: string;
@@ -39,7 +41,34 @@ const OTPForm: FunctionComponent<Props> = ({
   const [numbers, setNumbers] = useState<string[]>(
     Array.from(Array(OTP_DIGITS).keys()).map((idx) => ''),
   );
+
+  const [type, setType] = useState<string>();
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (timer > 0) {
+      const intervalId = setTimeout(() => {
+        setTimer((prevTime) => prevTime - 1);
+      }, 1000);
+      return () => clearTimeout(intervalId);
+    }
+    if (timer === 0) {
+      setIsSubmitDisabled(true);
+    }
+  }, [timer]);
+
+  useEffect(() => {
+    (async () => {
+      const campaignType = await getCampaignType(campaign_code);
+      setType(campaignType);
+    })();
+  }, [campaign_code]);
+
+  const formatTime = (time: any) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
 
   const handlePaste = useCallback((e: ClipboardEvent) => {
     e.preventDefault();
@@ -72,8 +101,8 @@ const OTPForm: FunctionComponent<Props> = ({
   };
 
   const validateForm = useCallback(() => {
-    setIsSubmitDisabled(numbers.join('').length !== OTP_DIGITS);
-  }, [numbers]);
+    setIsSubmitDisabled(numbers.join('').length !== OTP_DIGITS || timer === 0);
+  }, [numbers, timer]);
 
   useEffect(() => {
     validateForm();
@@ -85,22 +114,18 @@ const OTPForm: FunctionComponent<Props> = ({
 
       try {
         setIsSubmitDisabled(true);
-
-        await postLogin(campaign_code, verifyPayload);
-
+        if (type === 'quick_offer_code') {
+          await postLogin(campaign_code, verifyPayload, type ?? '');
+        } else {
+          await postLogin(campaign_code, verifyPayload);
+        }
         // logged in successfully (since an exception was not thrown)
         router.push(`/${campaign_code}/`);
       } catch (err: any) {
-        if (err.status === 401 && err.data?.code === 'bad_otp') {
-          toast.error(t('login.otpForm.wrongOtp'));
-        } else {
-          toast.error(t('login.form.SomethingWentWrong'));
-        }
-
         validateForm();
       }
     }
-  }, [numbers, loginPayload, campaign_code, router, t, validateForm]);
+  }, [numbers, loginPayload, campaign_code, router, type, validateForm]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,17 +190,13 @@ const OTPForm: FunctionComponent<Props> = ({
   );
 
   const resendCode = useCallback(async () => {
+    setIsSubmitDisabled(false);
+    setNumbers(Array.from(Array(OTP_DIGITS).keys()).map((idx) => ''));
+    setTimer(RESEND_CODE_SECONDS);
     try {
       await postLogin(campaign_code, loginPayload);
-      toast.success(t('login.otpForm.resendOtp'));
-    } catch (err: any) {
-      if (err.status === 401 && err.data?.code === 'missing_otp') {
-        toast.success(t('login.form.OtpSuccess'));
-      } else {
-        toast.error(t('login.form.SomethingWentWrong'));
-      }
-    }
-  }, [loginPayload, campaign_code, t]);
+    } catch (err: any) {}
+  }, [loginPayload, campaign_code]);
 
   return (
     <form
@@ -198,14 +219,14 @@ const OTPForm: FunctionComponent<Props> = ({
             <span
               className={'text-[14px] leading-[22px] font-[400] text-[#363839]'}
             >
-              {login_type === 'email'
+              {login_type === LoginMethods.email
                 ? t('login.otpForm.enterCodeEmail')
                 : t('login.otpForm.enterCodePhone')}
             </span>
             <span
               className={'text-[14px] leading-[22px] font-[600] text-[#363839]'}
             >
-              {t('login.otpForm.codeTimeOut')}
+              {formatTime(timer)}
             </span>
           </div>
           <Image
@@ -215,12 +236,13 @@ const OTPForm: FunctionComponent<Props> = ({
             height={20}
             className={'mt-1 cursor-pointer'}
             priority
+            onClick={() => window.location.reload()}
           />
         </div>
       </div>
       <div
         dir="ltr" // so code digit inputs are not reversed
-        className="flex w-full justify-between"
+        className={`flex w-full justify-between ${isIOS ? 'gap-3' : ''}`}
       >
         {numbers.map((element, idx) => (
           <Input

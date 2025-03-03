@@ -17,7 +17,7 @@ export default function BackLink({ text, href }: BackButtonProps) {
     <Link
       color="primary"
       size="sm"
-      className="font-bold cursor-pointer gap-1"
+      className="font-bold cursor-pointer gap-2"
       onPress={() => {
         if (href) {
           router.replace(href);

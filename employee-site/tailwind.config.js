@@ -56,16 +56,18 @@ module.exports = {
         'extra-cost-background-1': '#FEF0E4',
         'extra-cost-background-2': '#FA9F5629',
         'extra-cost-text-color': '#E06705',
-        'alert': '#FF5630',
+        alert: '#FF5630',
         'button-background-1': '#BDBDBD33',
         'button-text-color-1': '#919EAB99',
         'category-default': '#868788',
         'category-selected': '#363839',
+        'discount': '#79A18A',
+        'discount-light': '#E5F9EE',
         emerald: {
-          300: '#79A18A'
+          300: '#79A18A',
         },
         'avatar-background': '#D6DFFF',
-        'avatar-text': '#56618D'
+        'avatar-text': '#56618D',
       },
       fontFamily: {
         assistant: ['var(--font-assistant)'],
@@ -84,8 +86,10 @@ module.exports = {
         '3-1': '13px',
       },
       boxShadow: {
-        'dropdown': '-20px 20px 40px -4px rgba(145, 158, 171, 0.24), 0px 0px 2px 0px rgba(145, 158, 171, 0.24)',
-      }
+        dropdown:
+          '-20px 20px 40px -4px rgba(145, 158, 171, 0.24), 0px 0px 2px 0px rgba(145, 158, 171, 0.24)',
+        popup: '-20px 20px 40px -4px #919EAB3D, 0px 0px 2px 0px #919EAB3D',
+      },
     },
   },
   plugins: [

@@ -32,10 +32,11 @@ export function useCitiesList() {
     },
     [currentLocale, limit],
   );
+
   React.useEffect(() => {
     loadItems(0, '');
     setOffset(0);
-  }, [currentLocale]);
+  }, [currentLocale, loadItems]);
 
   const onLoadMore = () => {
     const newOffset = offset + limit;

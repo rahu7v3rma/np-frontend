@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
 import { FreeMode, Navigation, Thumbs, Pagination } from 'swiper/modules';
 import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react';
@@ -13,17 +13,19 @@ import 'swiper/css/thumbs';
 import 'swiper/css/pagination';
 
 import './styles.css';
-import { useCurrentLocale } from '@/locales/client';
-import Logo from '@/shared/Logo';
+import { useCurrentLocale, useI18n } from '@/locales/client';
 import { ProductImage } from '@/types/product';
 import { sortProductImages } from '@/utils/product';
 
 type Props = {
   images: ProductImage[] | undefined;
   brandLogo: string | undefined;
+  isOutOfStock: boolean;
 };
 
-export default function Images({ images, brandLogo }: Props) {
+export default function Images({ images, brandLogo, isOutOfStock }: Props) {
+  const t = useI18n();
+
   const [swiper, setSwiper] = useState<SwiperClass>();
 
   // Below state is used to rerender the component when swiper slide changes, to support custom pagination
@@ -44,8 +46,26 @@ export default function Images({ images, brandLogo }: Props) {
 
   const locale = useCurrentLocale();
 
+  // Use effect to ensure the swiper instance is fully initialized before accessing its properties
+  useEffect(() => {
+    if (swiper) {
+      // Updating the page count when the swiper instance is set
+      setSwiperCurrentPage(swiper.activeIndex + 1);
+    }
+  }, [swiper]);
+
+  useEffect(() => {
+    if (swiper) {
+      const selectedIndex = sortedImages?.findIndex((image) => image.selected);
+
+      if (selectedIndex && selectedIndex > -1) {
+        swiper.slideTo(selectedIndex);
+      }
+    }
+  }, [swiper, sortedImages]);
+
   return (
-    <div className="flex justify-center items-center">
+    <div className="relative flex justify-center items-center">
       <div className="w-full">
         <Swiper
           onSwiper={setSwiper}
@@ -58,11 +78,11 @@ export default function Images({ images, brandLogo }: Props) {
               thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
           }}
           modules={[FreeMode, Navigation, Thumbs, Pagination]}
-          className="mainSwiper w-full relative bg-gray-100 rounded-2xl !z-0"
+          className="mainSwiper w-full relative rounded-2xl !z-0"
         >
           {sortedImages?.map((productImg, index) => (
             <SwiperSlide key={index}>
-              <div className="flex w-full h-[45vw]">
+              <div className="relative flex w-full xl:h-[570px] h-[40vw] min-h-[360px]">
                 <Image
                   src={productImg.image}
                   alt={'Product Image'}
@@ -70,12 +90,16 @@ export default function Images({ images, brandLogo }: Props) {
                   width={0}
                   height={0}
                   loading="eager"
-                  className="object-cover"
+                  className="w-full object-contain"
                 />
+                {isOutOfStock && (
+                  <div className="absolute flex items-center justify-center bg-gray-800 bg-opacity-75 text-white text-xl font-bold">
+                    {t('products.out_of_stock')}
+                  </div>
+                )}
               </div>
             </SwiperSlide>
           ))}
-          {/* Brand Image */}
           <div className="absolute top-0 z-10 mx-2 my-2">
             {brandLogo ? (
               <Image src={brandLogo} height={22} width={80} alt="Brand Logo" />
@@ -90,10 +114,10 @@ export default function Images({ images, brandLogo }: Props) {
                 >
                   {locale === 'he' ? <FaChevronRight /> : <FaChevronLeft />}
                 </span>
-                <span>{swiper.activeIndex + 1}</span> /
-                <span>{swiper.slides.length}</span>
+                <span>{swiperCurrentPage}</span> /
+                <span>{sortedImages?.length}</span>
                 <span
-                  className={`px-2 cursor-pointer ${swiper.activeIndex === swiper.slides.length - 1 ? 'opacity-40 pointer-events-none' : ''}`}
+                  className={`px-2 cursor-pointer ${swiper.activeIndex === (sortedImages?.length || 0) - 1 ? 'opacity-40 pointer-events-none' : ''}`}
                   onClick={() => swiper.slideTo(swiper.activeIndex + 1)}
                 >
                   {locale === 'he' ? <FaChevronLeft /> : <FaChevronRight />}

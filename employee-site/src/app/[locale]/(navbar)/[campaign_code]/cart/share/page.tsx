@@ -19,9 +19,12 @@ const ShareCart: FunctionComponent<Props> = ({}: Props) => {
   const t = useI18n();
   const locale = useCurrentLocale();
   const { cart } = useContext(CartContext);
+  const { campaignDetails } = useContext(CampaignContext);
   const budget =
     useContext(CampaignContext).campaignDetails?.budget_per_employee ?? 0;
   const [giftPrice, setGiftPrice] = useState<number>(0);
+
+  const displayedCurrency = campaignDetails?.displayed_currency;
 
   useEffect(() => {
     const giftPrice = localStorage?.getItem('giftPrice');
@@ -113,13 +116,21 @@ const ShareCart: FunctionComponent<Props> = ({}: Props) => {
                   <span className="text-primary-100">{`$${giftPrice}`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{t('order.budget')}</span>
+                  <span>
+                    {displayedCurrency === 'POINT'
+                      ? t('order.points')
+                      : t('order.budget')}
+                  </span>
                   <span className="text-primary-100">
                     {budget !== undefined ? `$${budget}` : 'Loading...'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{t('order.budgetLeft')}</span>
+                  <span>
+                    {displayedCurrency === 'POINT'
+                      ? t('order.pointsLeft')
+                      : t('order.budgetLeft')}
+                  </span>
                   <span className="flex items-center gap-1">
                     <span className="text-primary-100">{`$${budget - giftPrice > 0 ? budget - giftPrice : 0}`}</span>
                   </span>

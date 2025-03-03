@@ -22,7 +22,9 @@ const useViewportEntry = (
     }
 
     return () => observer.disconnect();
-  }, [ref, cb, observerOptions]);
+
+    // need to add ref.current instead of ref to work beyond page 2 that's why i add ref.current
+  }, [ref.current, cb, observerOptions]);
 
   return null;
 };

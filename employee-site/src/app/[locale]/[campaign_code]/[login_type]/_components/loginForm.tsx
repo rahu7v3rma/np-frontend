@@ -10,19 +10,12 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { toast } from 'react-toastify';
 
 import { useI18n } from '@/locales/client';
-import { postLogin } from '@/services/api';
+import { postLogin, getCampaignType } from '@/services/api';
 import { reportError } from '@/services/monitoring';
 import Input from '@/shared/Input';
-import { LoginPayload } from '@/types/api';
-
-enum Modes {
-  email = 'e',
-  phone = 'p',
-  authId = 'a',
-}
+import { LoginMethods, LoginPayload } from '@/types/api';
 
 type Props = {
   organizationName: string;
@@ -45,14 +38,15 @@ const LoginForm: FunctionComponent<Props> = ({
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [isInvalidEmail, setisInvalidEmail] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [type, setType] = useState('');
 
   let modeText: string = t('login.form.phoneModeDescription');
   let inputPlaceholder = t('login.form.phoneModePlaceholder');
 
-  if (login_type === Modes.email) {
+  if (login_type === LoginMethods.email) {
     modeText = t('login.form.emailModeDescription');
     inputPlaceholder = t('login.form.emailModePlaceholder');
-  } else if (login_type === Modes.authId) {
+  } else if (login_type === LoginMethods.authId) {
     modeText = t('login.form.idModeDescription');
     inputPlaceholder = t('login.form.idModePlaceholder');
   }
@@ -70,20 +64,26 @@ const LoginForm: FunctionComponent<Props> = ({
     validateForm();
   }, [fieldValue, validateForm]);
 
+  useEffect(() => {
+    (async () => {
+      const campaignType = await getCampaignType(campaign_code);
+      setType(campaignType);
+    })();
+  }, [campaign_code]);
+
   const onLogin = useCallback(async () => {
     let loginPayload;
 
-    if (login_type === Modes.email) {
+    if (login_type === LoginMethods.email) {
       if (!isValidEmail(fieldValue)) {
         setisInvalidEmail(true);
-        toast.error(t('login.form.ValidEmail'));
         setErrorMessage(t('login.form.ValidEmail'));
         return;
       }
       setisInvalidEmail(false);
 
       loginPayload = { email: fieldValue };
-    } else if (login_type === Modes.phone) {
+    } else if (login_type === LoginMethods.phone) {
       loginPayload = { phone_number: fieldValue };
     } else {
       loginPayload = { auth_id: fieldValue };
@@ -92,7 +92,11 @@ const LoginForm: FunctionComponent<Props> = ({
     try {
       setIsSubmitDisabled(true);
 
-      await postLogin(campaign_code, loginPayload);
+      if (type === 'quick_offer_code') {
+        await postLogin(campaign_code, loginPayload, type);
+      } else {
+        await postLogin(campaign_code, loginPayload);
+      }
 
       // logged in successfully (since an exception was not thrown)
       router.push(`/${campaign_code}/`);
@@ -100,16 +104,15 @@ const LoginForm: FunctionComponent<Props> = ({
       if (err.status === 401 && err.data?.code === 'missing_otp') {
         // should enter otp code now
         onLoginSuccess(loginPayload);
-        toast.success(t('login.form.OtpSuccess'));
-      } else if (err.status === 401 && err.data?.code === 'bad_credentials') {
-        toast.error(t('login.form.wrongCredentials'));
+      } else if (
+        (err.status === 401 && err.data?.code === 'bad_credentials') ||
+        (err.status === 400 && err.data?.code === 'request_invalid')
+      ) {
+        // 'request_invalid' error can be raised if the phone number is bad
+        // since we validate it in the backend
         setErrorMessage(t('login.form.wrongCredentials'));
       } else {
         reportError(err);
-
-        // some error occurred - should add actual texts here for known errors
-        // such as bad credentials
-        toast.error(t('login.form.SomethingWentWrong'));
       }
 
       validateForm();
@@ -122,6 +125,7 @@ const LoginForm: FunctionComponent<Props> = ({
     router,
     onLoginSuccess,
     validateForm,
+    type,
   ]);
 
   const handleFormSubmit = useCallback(

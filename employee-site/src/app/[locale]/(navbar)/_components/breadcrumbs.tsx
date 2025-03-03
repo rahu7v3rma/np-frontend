@@ -19,13 +19,13 @@ export default function Breadcrumbs({
         return (
           <li key={item.label} className="flex items-center">
             {index !== 0 && (
-              <span className="inline-block mx-4 w-1 h-1 rounded bg-gray-400"></span>
+              <span className="inline-block mx-4 w-1 h-1 rounded bg-gray-400 text-sm leading-[22px]"></span>
             )}
             <Link
               href={item.link}
               className={
                 items.length === index + 1
-                  ? 'text-gray-400 pointer-events-none'
+                  ? 'text-gray-400 pointer-events-none text-sm leading-[22px]'
                   : 'text-primary hover:text-gray-400'
               }
             >

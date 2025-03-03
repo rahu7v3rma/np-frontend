@@ -3,22 +3,28 @@
 import { Button, Card, CardBody } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FunctionComponent, useCallback, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 
 import { useI18n } from '@/locales/client';
+import { getCampaignType } from '@/services/api';
 import { LoginPayload } from '@/types/api';
 import { CampaignDetailsType } from '@/types/campaign';
+import { QuickOfferDetailsType } from '@/types/quickOffer';
 import { CUSTOMER_SERVICE_WHATSAPP_NUMBER } from '@/utils/const';
 
 import LoginForm from './loginForm';
 import OTPForm from './otpForm';
 
 type Props = {
-  campaignDetails: CampaignDetailsType;
+  campaignCode: string;
+  campaignDetails: CampaignDetailsType | QuickOfferDetailsType;
+  isIOS: boolean;
 };
 
 const FormContainer: FunctionComponent<Props> = ({
+  campaignCode,
   campaignDetails,
+  isIOS,
 }: Props) => {
   const t = useI18n();
   const [loginPayload, setLoginPayload] = useState<LoginPayload | null>(null);
@@ -77,6 +83,7 @@ const FormContainer: FunctionComponent<Props> = ({
       <OTPForm
         organizationName={campaignDetails.organization_name}
         loginPayload={loginPayload}
+        isIOS={isIOS}
       />
     );
   }

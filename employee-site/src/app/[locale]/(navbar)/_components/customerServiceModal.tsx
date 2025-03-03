@@ -14,9 +14,9 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { FaPhone } from 'react-icons/fa6';
 import { GoCreditCard, GoGift } from 'react-icons/go';
-import { MdOutlineChangeCircle } from 'react-icons/md';
+import { MdOutlineBackpack, MdOutlineChangeCircle } from 'react-icons/md';
 
-import { useI18n } from '@/locales/client';
+import { useCurrentLocale, useI18n } from '@/locales/client';
 import { CUSTOMER_SERVICE_WHATSAPP_NUMBER } from '@/utils/const';
 
 export default function CustomerServiceModal({
@@ -25,6 +25,7 @@ export default function CustomerServiceModal({
   onClose: () => void;
 }) {
   const t = useI18n();
+  const locale = useCurrentLocale();
   const { isOpen, onOpen } = useDisclosure();
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function CustomerServiceModal({
         footer:
           'border-t-[1px] border-[#919EAB] border-opacity-40 justify-start items-start flex-col',
       }}
+      dir="ltr"
     >
       <ModalContent>
         {(onClose) => (
@@ -85,6 +87,14 @@ export default function CustomerServiceModal({
                 </div>
                 <div className="mt-[24px]">
                   <div className="flex items-center gap-2">
+                    <MdOutlineBackpack size="1.5rem" />
+                    <span className="text-sm font-semibold text-[#363839]">
+                      {t('customerServiceDialog.chooseVariationTitle')}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-[24px]">
+                  <div className="flex items-center gap-2">
                     <MdOutlineChangeCircle size="1.5rem" />
                     <span className="text-sm font-semibold text-[#363839]">
                       {t('customerServiceDialog.replaceChoicesTitle')}
@@ -94,9 +104,9 @@ export default function CustomerServiceModal({
                     <li>
                       {t('customerServiceDialog.replaceChoicesDescription')}
                     </li>
-                    <li>
+                    {/* <li>
                       {t('customerServiceDialog.replaceChoicesDescriptionTwo')}
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
                 <div className="mt-[24px]">
@@ -151,13 +161,13 @@ export default function CustomerServiceModal({
               <p className="text-[14px] font-[600] text-[#363839] my-1 ">
                 {t('customerServiceDialog.furtherQuestions')}
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 pb-5 ">
                 <Button
                   as={Link}
                   target="_blank"
                   href={`https://wa.me/${CUSTOMER_SERVICE_WHATSAPP_NUMBER}`}
                   variant="ghost"
-                  dir="ltr"
+                  className={`${locale === 'he' ? 'order-2' : 'order-1'} sm:px-4 px-2`}
                 >
                   <Image
                     src="/whatsapp-icon.svg"
@@ -165,15 +175,14 @@ export default function CustomerServiceModal({
                     height={28}
                     alt="whatsapp"
                   />
-                  <div className="text-[#2B324C] text-[14px] font-[600]">
+                  <div className="text-[#2B324C] sm:text-[14px] text-[12px] font-[600]">
                     {t('button.customerService')}
                   </div>
                 </Button>
                 <Button
                   startContent={<FaPhone />}
                   variant="ghost"
-                  dir="ltr"
-                  className="text-[#2B324C] text-[14px] font-[600]"
+                  className={`text-[#2B324C] sm:text-[14px] text-[12px] font-[600] sm:px-4 px-2 ${locale === 'he' ? 'order-1' : 'order-2'}`}
                 >
                   +{CUSTOMER_SERVICE_WHATSAPP_NUMBER}
                 </Button>

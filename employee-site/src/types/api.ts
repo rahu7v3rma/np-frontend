@@ -13,7 +13,6 @@ export type LoginPayload =
   | { auth_id: string };
 
 export type OrderPayload = {
-  product_id: number;
   full_name: string;
   phone_number: string;
   additional_phone_number: string | undefined;
@@ -22,4 +21,13 @@ export type OrderPayload = {
   delivery_street_number: number;
   delivery_apartment_number: string | undefined;
   delivery_additional_details: string | undefined;
+  country: string;
+  state_code: string;
+  zip_code: number;
 };
+
+export enum LoginMethods {
+  email = 'e',
+  phone = 'p',
+  authId = 'a',
+}

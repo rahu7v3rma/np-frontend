@@ -244,13 +244,14 @@ paths:
                       main_page_second_banner_text_color: WHITE
                       delivery_location: ToOffice
                       office_delivery_address: "Jail road 352, 45, Lahore"
-                      product_selection_mode: MULTIPLE
+                      product_selection_mode: SINGLE
                       displayed_currency: COINS
                       budget_per_employee: 2000
                       employee_order_reference: null
                       employee_name: First Last
                       login_page_image: /login.png
                       login_page_mobile_image: /login.png
+                      # campaign_type: Quick Offer
                 he:
                   value:
                     success: true
@@ -511,6 +512,46 @@ paths:
           required: false
           schema:
             type: integer
+        - name: sort
+          in: query
+          description: Sort products by specified attribute (e.g., price, name)
+          required: false
+          schema:
+            type: string
+            enum: [desc, asc]
+        - name: sub_categories
+          in: query
+          description: Filter products by sub-categories (comma-separated values)
+          required: false
+          schema:
+            type: string
+            example: electronics,appliances,clothing
+        - name: brands
+          in: query
+          description: Filter products by brands (comma-separated values)
+          required: false
+          schema:
+            type: string
+            example: brand1,brand2,brand3
+        - name: min_price
+          in: query
+          description: Filter products by minimum price
+          required: false
+          schema:
+            type: number
+        - name: max_price
+          in: query
+          description: Filter products by maximum price
+          required: false
+          schema:
+            type: number
+        - name: product_type
+          in: query
+          description: Filter products by product type
+          required: false
+          schema:
+            type: string
+            example: product_type1,product_type2,product_type3
       responses:
         '200':
           description: Campaign products retrieved successfully
@@ -563,6 +604,8 @@ paths:
                               type: integer
                             extra_price:
                               type: integer
+                            remaining_quantity:
+                              type: integer
                             supplier:
                               type: object
                               properties:
@@ -595,6 +638,45 @@ paths:
                                     type: string
                                   icon_image:
                                     type: string
+                            variations:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    variation_kind:
+                                      type: string
+                                      example: "COLOR"
+                                    system_name:
+                                      type: string
+                                      example: "Coat Color"
+                                    site_name:
+                                      type: string
+                                      example: "Color"
+                                    color_variation:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          name:
+                                            type: string
+                                            example: "Green"
+                                          color_code:
+                                            type: string
+                                            example: "#3ef40b"
+                                          image:
+                                            type: string
+                                            example: "path_to_image"
+                                    text_variation:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          text_en:
+                                            type: string
+                                            example: "10"
+                                          text_he:
+                                            type: string
+                                            example: "size_he"
               examples:
                 example:
                   value:
@@ -603,8 +685,8 @@ paths:
                     status: 200
                     data:
                       page_num: 1
-                      has_more: false
-                      total_count: 2
+                      has_more: true
+                      total_count: 20
                       in_budget_count: 0
                       page_data:
                         - id: 1
@@ -618,6 +700,7 @@ paths:
                           exchange_policy: ""
                           calculated_price: 65
                           extra_price: 55
+                          remaining_quantity: 0
                           supplier:
                             name: Supplier 1
                           brand:
@@ -625,15 +708,66 @@ paths:
                             logo_image: /image/open/brands/1.png
                           images:
                             - main: true
-                              image: /image/open/products/1_1.png
+                              image: /product-img.png
                             - main: false
-                              image: /image/open/products/1_2.png
+                              image: /product-jacket-white.png
                           categories:
                             - id: 1
                               name: Category A
                               icon_image: /image/open/categories/a.png
                           tags:
                             - name: Tag A
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
                         - id: 2
                           name: Product 2
                           description: Description of Product 2
@@ -645,6 +779,7 @@ paths:
                           exchange_policy: Exchange policy of product 2
                           calculated_price: 45
                           extra_price: 88
+                          remaining_quantity: 0
                           supplier:
                             name: Supplier 2
                           brand:
@@ -652,15 +787,1646 @@ paths:
                             logo_image: /image/open/brands/2.png
                           images:
                             - main: true
-                              image: /image/open/products/2_1.png
+                              image: /login.png
                             - main: false
-                              image: /image/open/products/2_2.png
+                              image: /logo-login.png
                           categories:
                             - id: 1
                               name: Category B
                               icon_image: /image/open/categories/b.png
                           tags:
                             - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                    pjk               image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                        - id: 2
+                          name: Product 2
+                          description: Description of Product 2
+                          sku: "222222"
+                          link: ""
+                          technical_details: Technical details of Product 2
+                          warranty: ""
+                          exchange_value: 300
+                          exchange_policy: Exchange policy of product 2
+                          calculated_price: 45
+                          extra_price: 88
+                          remaining_quantity: 0
+                          supplier:
+                            name: Supplier 2
+                          brand:
+                            name: Brand 2
+                            logo_image: /image/open/brands/2.png
+                          images:
+                            - main: true
+                              image: /login.png
+                            - main: false
+                              image: /logo-login.png
+                          categories:
+                            - id: 1
+                              name: Category B
+                              icon_image: /image/open/categories/b.png
+                          tags:
+                            - name: Tag B
+                          variations:
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Color"
+                              color_variation: []
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "COLOR"
+                              system_name: "Coat Color"
+                              site_name: "Coat Color"
+                              color_variation:
+                                - name: "Green"
+                                  color_code: "#3ef40b"
+                                  image: "/product-jacket-white.png"
+                                - name: "Black"
+                                  color_code: "#000000"
+                                  image: "/product-jacket.png"
+                                - name: "yellow"
+                                  color_code: "#3ff60b"
+                                  image: "/product-jacket-white.png"
+                                - name: "blue"
+                                  color_code: "#666666"
+                                  image: "/product-jacket.png"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
+                            - variation_kind: "TEXT"
+                              system_name: "Coat Color"
+                              site_name: "size"
+                              text_variation:
+                                - text_en: "10"
+                                  text_he: "size_he"
+                                - text_en: "11"
+                                  text_he: "size_he"
+                                - text_en: "12"
+                                  text_he: "size_he"
         '404':
           description: Campaign not found
           content:
@@ -764,6 +2530,8 @@ paths:
                         type: integer
                       extra_price:
                         type: integer
+                      remaining_quantity:
+                              type: integer  
                       supplier:
                         type: object
                         properties:
@@ -797,6 +2565,45 @@ paths:
                             icon_image:
                               type: string
                       product_type: string
+                      variations:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    variation_kind:
+                                      type: string
+                                      example: "COLOR"
+                                    system_name:
+                                      type: string
+                                      example: "Coat Color"
+                                    site_name:
+                                      type: string
+                                      example: "Color"
+                                    color_variation:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          name:
+                                            type: string
+                                            example: "Green"
+                                          color_code:
+                                            type: string
+                                            example: "#3ef40b"
+                                          image:
+                                            type: string
+                                            example: "path_to_image"
+                                    text_variation:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          text_en:
+                                            type: string
+                                            example: "10"
+                                          text_he:
+                                            type: string
+                                            example: "size_he"
               examples:
                 example:
                   value:
@@ -815,6 +2622,7 @@ paths:
                       exchange_policy: ""
                       calculated_price: 65
                       extra_price: 55
+                      remaining_quantity: 0
                       supplier:
                         name: Supplier 1
                       brand:
@@ -822,14 +2630,63 @@ paths:
                         logo_image: /image/open/brands/1.png
                       images:
                         - main: true
-                          image: /image/open/products/1_1.png
+                          image: /login.png
                         - main: false
-                          image: /image/open/products/1_2.png
+                          image: /logo.png
                       categories:
                         - id: 1
                           name: Category A
                           icon_image: /image/open/categories/a.png
                       product_type: SENT_BY_SUPPLIER
+                      variations:
+                        - variation_kind: COLOR
+                          system_name: color1
+                          site_name: color1
+                          color_variation: []
+                        - variation_kind: COLOR
+                          system_name: primary
+                          site_name: primary
+                          color_variation:
+                            - name: red
+                              color_code: '#FF0000'
+                              image: /product-img.png
+                            - name: blue
+                              color_code: '#0000FF'
+                              image: /product-jacket-white.png
+                        - variation_kind: TEXT
+                          system_name: size
+                          site_name: size
+                          text_variation:
+                            - text_en: 10
+                              text_he: 10
+                            - text_en: 11
+                              text_he: 11
+                            - text_en: 12
+                              text_he: 12
+                        - variation_kind: COLOR
+                          system_name: secondary
+                          site_name: secondary
+                          color_variation:
+                            - name: Green
+                              color_code: '#008000'
+                              image: /product-jacket.png
+                            - name: Black
+                              color_code: '#000000'
+                              image: /logo-login.png
+                        - variation_kind: TEXT
+                          system_name: brand
+                          site_name: brand
+                          text_variation:
+                            - text_en: brand1
+                              text_he: מותג1
+                            - text_en: brand2
+                              text_he: מותג2
+                            - text_en: brand3
+                              text_he: מותג3
+                        - variation_kind: TEXT
+                          system_name: option2
+                          site_name: option3
+                          text_variation: []
         '404':
           description: Product does not exist
           content:
@@ -1577,6 +3434,10 @@ paths:
                   type: integer
                 quantity:
                   type: integer
+                variations:
+                  type: object
+                  additionalProperties:
+                    type: string  # Or specify the value type if it's not always a string
               required:
                 - product_id
                 - quantity
@@ -1585,6 +3446,9 @@ paths:
                 value:
                   product_id: 123
                   quantity: 2
+                  variations:
+                    color: red
+                    size: M
       responses:
         '200':
           description: Product Found
@@ -1744,6 +3608,12 @@ paths:
                                   type: number
                                 extra_price:
                                   type: number
+                                remaining_quantity:
+                                  type: integer  
+                                variations:
+                                  type: object
+                                  additionalProperties:
+                                    type: string
                             quantity:
                               type: integer
               examples:
@@ -1776,6 +3646,13 @@ paths:
                             categories: []
                             calculated_price: 10
                             extra_price: 9
+                            remaining_quantity: 0
+                          variations:
+                            color1: "green"
+                            size: "L"
+                            color2: "yellow"
+                            option1: "M"
+                            option2: "S"
                           quantity: 1
                         - id: 2
                           product:
@@ -1797,6 +3674,10 @@ paths:
                             categories: []
                             calculated_price: 1
                             extra_price: 0
+                            remaining_quantity: 0
+                          variations: 
+                            color1: "green"
+                            size: "L"
                           quantity: 0
         '404':
           description: Cart not found
@@ -1811,3 +3692,2210 @@ paths:
                     code: not_found
                     message: Not found.
                     status: 404
+  
+  '/campaign/{campaign_code}/filter_lookup':
+    get:
+      summary: Filter Lookup for Campaign
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The code of the campaign to filter on.
+        - name: lookup
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [product_types, brand, subCategories]
+        - name: tax
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: To check tax is included or not.
+        - name: original_budget
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: To check tax is included or not.
+      responses:
+        '200':
+          description: Data fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data fetched successfully.
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+              examples:
+                product_types:
+                  value:
+                    success: true
+                    message: Data fetched successfully.
+                    status: 200
+                    data:
+                      - id: "1"
+                        name: "Electronics"
+                      - id: "2"
+                        name: "Clothing"
+                      - id: "3"
+                        name: "Home Appliances"
+        '400':
+          description: Bad request, invalid parameters or missing lookup type
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Request is invalid.
+                  status:
+                    type: integer
+                    example: 400
+                  error:
+                    type: object
+                    example: { lookup: ["Invalid lookup type"] }
+                  data:
+                    type: object
+                    example: { allowed_query_params: ["product_types", "brands", "subCategories"] }
+        '404':
+          description: Campaign not found or inactive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Campaign not found or inactive.
+                  code:
+                    type: string
+                    example: not_found
+                  status:
+                    type: integer
+                    example: 404
+
+  '/campaign/validate/{campaign_code}':
+    get:
+      summary: Get Campaign or Quick Offer Details
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Campaign or Quick Offer code validated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: string
+                    enum:
+                      - wallet
+                      - campaign_code
+                      - quick_offer_code
+                      - invalid_code
+              examples:
+                wallet:
+                  value:
+                    success: true
+                    message: wallet
+                    status: 200
+                    data: wallet
+                quick_offer_code:
+                  value:
+                    success: true
+                    message: Quick offer code exists
+                    status: 200
+                    data: quick_offer_code
+                campaign_code:
+                  value:
+                    success: true
+                    message: Campaign code exists
+                    status: 200
+                    data: campaign_code
+                invalid_code:
+                  value:
+                    success: true
+                    message: Invalid code
+                    status: 200
+                    data: invalid_code
+        '404':
+          description: Code not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                not_found:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Code does not exist.
+                    status: 404
+                    data: {}
+
+  '/campaign/{campaign_code}/quick-offer-login':
+    post:
+      summary: Organization login
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Email for login attempt
+                phone_number:
+                  type: string
+                  description: Phone number for login attempt
+                auth_id:
+                  type: string
+                  description: Authentication ID for login attempt
+                otp:
+                  type: string
+                  description: One-time password for login attempt
+      responses:
+        '200':
+          description: Credentials are correct
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      auth_token:
+                        type: string
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: User logged in successfully.
+                    status: 200
+                    data:
+                      auth_token: abcd1234
+        '400':
+          description: Request is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: request_invalid
+                    message: Request is invalid.
+                    status: 400
+                    data: {}
+        '401':
+          description: Bad credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                bad_credentials:
+                  value:
+                    success: false
+                    code: bad_credentials
+                    message: Bad credentials.
+                    status: 401
+                    data: {}
+                bad_otp:
+                  value:
+                    success: false
+                    code: bad_otp
+                    message: Bad OTP code.
+                    status: 401
+                    data: {}
+                missing_otp:
+                  value:
+                    success: false
+                    code: missing_otp
+                    message: Missing OTP code.
+                    status: 401
+                    data: {}
+      description: Organization logged in successfully
+
+  '/campaign/quick-offer':
+    get:
+      summary: Fetch quick offer details
+      parameters:
+        - name: campaign_code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Offers fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      tags:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                      organization:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          logo_image:
+                            type: string
+                      name:
+                        type: string
+                      name_en:
+                        type: string
+                      name_he:
+                        type: string
+                      code:
+                        type: string
+                      quick_offer_type:
+                        type: string
+                      ship_to:
+                        type: string
+                      status:
+                        type: string
+                      login_page_title:
+                        type: string
+                      login_page_subtitle:
+                        type: string
+                      main_page_first_banner_title:
+                        type: string
+                      main_page_first_banner_subtitle:
+                        type: string
+                      main_page_first_banner_image:
+                        type: string
+                      main_page_first_banner_mobile_image:
+                        type: string
+                      main_page_second_banner_title:
+                        type: string
+                      main_page_second_banner_subtitle:
+                        type: string
+                      main_page_second_banner_background_color:
+                        type: string
+                      main_page_second_banner_text_color:
+                        type: string
+                      sms_sender_name:
+                        type: string
+                      sms_welcome_text:
+                        type: string
+                      email_welcome_text:
+                        type: string
+                      login_page_image:
+                        type: string
+                      login_page_mobile_image:
+                        type: string
+                      auth_method:
+                        type: string
+                      phone_number:
+                        type: string
+                        nullable: true
+                      email:
+                        type: string
+                      nicklas_status:
+                        type: string
+                      client_status:
+                        type: string
+                      last_login:
+                        type: string
+                        nullable: true
+                      selected_products:
+                        type: array
+                        items:
+                          type: object
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Offers fetched successfully
+                    status: 200
+                    data:
+                      id: 2
+                      tags:
+                        - name: Holiday
+                      organization:
+                        name: organization_name_1
+                        logo_image: /media/bcc3a484-3b92-4500-be36-6b74d4527d99.png
+                      name: QuickOffer
+                      code: ef069f4f841222e8
+                      quick_offer_type: EVENT
+                      ship_to: TO_OFFICE
+                      status: ACTIVE
+                      login_page_title: default
+                      login_page_subtitle: default
+                      main_page_first_banner_title: default
+                      main_page_first_banner_subtitle: default
+                      main_page_first_banner_image: /media/default-banner.png
+                      main_page_first_banner_mobile_image: /media/default-banner.png
+                      main_page_second_banner_title: default
+                      main_page_second_banner_subtitle: default
+                      main_page_second_banner_background_color: "#C1E0CE"
+                      main_page_second_banner_text_color: WHITE
+                      sms_sender_name: default
+                      sms_welcome_text: default
+                      email_welcome_text: default
+                      login_page_image: /media/default-banner.png
+                      login_page_mobile_image: /media/default-banner.png
+                      auth_method: EMAIL
+                      phone_number: null
+                      email: hassamhassan.qc@gmail.com
+                      nicklas_status: WAITING_TO_CLIENT
+                      client_status: READY_TO_CHECK
+                      last_login: null
+                      selected_products: []
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: request_invalid
+                    message: Request is invalid.
+                    status: 400
+                    data: {}
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                not_found:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Campaign not found.
+                    status: 404
+                    data: {}
+
+  '/campaign/quick-offer-products':
+    get:
+      summary: Fetch Quick Offer Products
+      description: Returns a list of quick offer products along with their details
+      responses:
+        '200':
+          description: Quick offer products fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Quick offer products fetched successfully.
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      page_data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: string
+                              example: oven he
+                            description:
+                              type: string
+                              example: 123
+                            sku:
+                              type: string
+                              example: prod_oven
+                            link:
+                              type: string
+                              example: ""
+                            technical_details:
+                              type: string
+                              nullable: true
+                              example: null
+                            warranty:
+                              type: string
+                              nullable: true
+                              example: null
+                            exchange_value:
+                              type: string
+                              nullable: true
+                              example: null
+                            exchange_policy:
+                              type: string
+                              nullable: true
+                              example: null
+                            product_type:
+                              type: string
+                              example: REGULAR
+                            product_kind:
+                              type: string
+                              example: PHYSICAL
+                            brand:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  example: test_brand_2
+                                logo_image:
+                                  type: string
+                                  example: /media/a2faa798-87e0-4e5f-beeb-370462ea6235.JPG
+                            supplier:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                  example: Hassam Hassan
+                            images:
+                              type: array
+                              items:
+                                type: string
+                              example: []
+                            categories:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 1
+                                  name:
+                                    type: string
+                                    example: organization_name_1
+                                  icon_image:
+                                    type: string
+                                    nullable: true
+                                    example: null
+                                  order:
+                                    type: integer
+                                    example: 10
+                            calculated_price:
+                              type: number
+                              example: 100
+                            remaining_quantity:
+                              type: integer
+                              example: 2147483647
+                      page_num:
+                        type: integer
+                        example: 1
+                      has_more:
+                        type: boolean
+                        example: false
+                      total_count:
+                        type: integer
+                        example: 2
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: not_found
+                    message: No quick offer products found.
+                    status: 404
+                    data: {}
+
+  '/campaign/quick-offer-product/{product_id}':
+      get:
+        summary: Get Product Details
+        parameters:
+          - name: campaign_code
+            in: path
+            required: true
+            schema:
+              type: string
+          - name: product_id
+            in: path
+            required: true
+            schema:
+              type: string
+          - name: language
+            in: query
+            description: Language for campaign details (optional)
+            required: false
+            schema:
+              type: string
+              default: "en"
+        responses:
+          '200':
+            description: Product data fetched successfully.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    status:
+                      type: integer
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        sku:
+                          type: string
+                        link:
+                          type: string
+                        technical_details:
+                          type: string
+                        warranty:
+                          type: string
+                        exchange_value:
+                          type: integer
+                        exchange_policy:
+                          type: string
+                        calculated_price:
+                          type: integer
+                        extra_price:
+                          type: integer
+                        remaining_quantity:
+                                type: integer  
+                        supplier:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                        brand:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            logo_image:
+                              type: string
+                        images:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              main:
+                                type: boolean
+                              image:
+                                type: string
+                        categories:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              name:
+                                type: string
+                              icon_image:
+                                type: string
+                        product_type: string
+                examples:
+                  example:
+                    value:
+                      success: true
+                      message: "Product data fetched successfully."
+                      status: 200
+                      data: 
+                        id: 1
+                        name: Product 1
+                        description: Description of Product 1
+                        sku: "111111"
+                        link: ""
+                        technical_details: Technical details of Product 1
+                        warranty: 1 year under conditions X and Y
+                        exchange_value: 0
+                        exchange_policy: ""
+                        calculated_price: 65
+                        extra_price: 55
+                        remaining_quantity: 0
+                        supplier:
+                          name: Supplier 1
+                        brand:
+                          name: Brand 1
+                          logo_image: /image/open/brands/1.png
+                        images:
+                          - main: true
+                            image: /image/open/products/1_1.png
+                          - main: false
+                            image: /image/open/products/1_2.png
+                        categories:
+                          - id: 1
+                            name: Category A
+                            icon_image: /image/open/categories/a.png
+                        product_type: SENT_BY_SUPPLIER
+          '404':
+            description: Product does not exist
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error'
+                examples:
+                  example:
+                    value:
+                      success: false
+                      code: not_found
+                      message: Product does not exist.
+                      status: 404
+                      data: {}
+
+  '/campaign/list/add_product':
+      post:
+        summary: Add product to cart
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: integer
+                  quantity:
+                    type: integer
+                required:
+                  - product_id
+                  - quantity
+              examples:
+                example:
+                  value:
+                    product_id: 123
+                    quantity: 2
+        responses:
+          '200':
+            description: Product Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    status:
+                      type: integer
+                    data:
+                      type: object
+                      properties:
+                        cart_id:
+                          type: integer
+                examples:
+                  example:
+                    value:
+                      success: true
+                      message: Cart updated successfully.
+                      status: 200
+                      data:
+                        cart_id: 1
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    status:
+                      type: integer
+                    data:
+                      type: object
+                examples:
+                  example:
+                    value:
+                      success: false
+                      message: Request is invalid
+                      code: request_invalid
+                      status: 400
+                      data: {}
+          '401':
+            description: Product Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    status:
+                      type: integer
+                    data:
+                      type: object
+                examples:
+                  example:
+                    value:
+                      success: false
+                      message: Bad credentials.
+                      code: bad_credentials
+                      status: 401
+                      data: {}
+  '/campaign/quick-offer/{quick_offer_code}':
+    get:
+      summary: Fetch quick offer details
+      parameters:
+        - name: quick_offer_code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: quick offer fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      tags:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                      name:
+                        type: string
+                      name_en:
+                        type: string
+                      name_he:
+                        type: string
+                      code:
+                        type: string
+                      quick_offer_type:
+                        type: string
+                      ship_to:
+                        type: string
+                      status:
+                        type: string
+                      login_page_title:
+                        type: string
+                      login_page_subtitle:
+                        type: string
+                      main_page_first_banner_title:
+                        type: string
+                      main_page_first_banner_subtitle:
+                        type: string
+                      main_page_first_banner_image:
+                        type: string
+                      main_page_first_banner_mobile_image:
+                        type: string
+                      main_page_second_banner_title:
+                        type: string
+                      main_page_second_banner_subtitle:
+                        type: string
+                      main_page_second_banner_background_color:
+                        type: string
+                      main_page_second_banner_text_color:
+                        type: string
+                      sms_sender_name:
+                        type: string
+                      sms_welcome_text:
+                        type: string
+                      email_welcome_text:
+                        type: string
+                      login_page_image:
+                        type: string
+                      login_page_mobile_image:
+                        type: string
+                      auth_method:
+                        type: string
+                      phone_number:
+                        type: string
+                        nullable: true
+                      email:
+                        type: string
+                      nicklas_status:
+                        type: string
+                      client_status:
+                        type: string
+                      last_login:
+                        type: string
+                        nullable: true
+                      selected_products:
+                        type: array
+                        items:
+                          type: object
+                      organization_name:
+                        type: string
+                      organization_logo_image:
+                        type: string
+                      is_active:
+                        type: boolean
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: quick offer fetched successfully
+                    status: 200
+                    data:
+                      id: 2
+                      tags:
+                        - name: Holiday
+                      name: QuickOffer
+                      code: ef069f4f841222e8
+                      quick_offer_type: EVENT
+                      ship_to: TO_OFFICE
+                      status: ACTIVE
+                      login_page_title: default
+                      login_page_subtitle: default
+                      main_page_first_banner_title: default
+                      main_page_first_banner_subtitle: default
+                      main_page_first_banner_image: /media/default-banner.png
+                      main_page_first_banner_mobile_image: /media/default-banner.png
+                      main_page_second_banner_title: default
+                      main_page_second_banner_subtitle: default
+                      main_page_second_banner_background_color: "#C1E0CE"
+                      main_page_second_banner_text_color: WHITE
+                      sms_sender_name: default
+                      sms_welcome_text: default
+                      email_welcome_text: default
+                      login_page_image: /media/default-banner.png
+                      login_page_mobile_image: /media/default-banner.png
+                      auth_method: EMAIL
+                      phone_number: null
+                      email: hassamhassan.qc@gmail.com
+                      nicklas_status: WAITING_TO_CLIENT
+                      client_status: READY_TO_CHECK
+                      last_login: null
+                      selected_products: []
+                      organization_name: organization_name_1
+                      organization_logo_image: /media/bcc3a484-3b92-4500-be36-6b74d4527d99.png
+                      is_active: true
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: request_invalid
+                    message: Request is invalid.
+                    status: 400
+                    data: {}
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                not_found:
+                  value:
+                    success: false
+                    code: not_found
+                    message: Campaign not found.
+                    status: 404
+                    data: {}
+
+  '/campaign/list':
+        get:
+          summary: Get Campaign Details
+          parameters:
+            - name: language
+              in: query
+              description: Language for cart details (optional)
+              required: false
+              schema:
+                type: string
+                default: "en"
+            - name: include_tax
+              in: query
+              description: Determines whether to include tax in the product prices (true/false)
+              required: false
+              schema:
+                type: boolean
+                enum: [true, false]
+          responses:
+            '200':
+              description: Cart fetched successfully
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      success:
+                        type: boolean
+                      message:
+                        type: string
+                      status:
+                        type: integer
+                      data:
+                        type: object
+                        properties:
+                          products:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                product:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                    name:
+                                      type: string
+                                    description:
+                                      type: string
+                                    sku:
+                                      type: string
+                                    link:
+                                      type: string
+                                    technical_details:
+                                      type: string
+                                    warranty:
+                                      type: string
+                                    exchange_value:
+                                      type: number
+                                    exchange_policy:
+                                      type: string
+                                    brand:
+                                      type: object
+                                      properties:
+                                        name:
+                                          type: string
+                                        logo_image:
+                                          type: string
+                                    supplier:
+                                      type: object
+                                      properties:
+                                        name:
+                                          type: string
+                                    images:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          main:
+                                            type: boolean
+                                          image:
+                                            type: string
+                                    categories:
+                                      type: array
+                                      items:
+                                        type: string
+                                    calculated_price:
+                                      type: number
+                                    extra_price:
+                                      type: number
+                                    remaining_quantity:
+                                      type: integer
+                                quantity:
+                                  type: integer
+                  examples:
+                    en:
+                      value:
+                        success: true
+                        message: Cart fetched successfully
+                        status: 200
+                        data:
+                          products:
+                            - id: 1
+                              product:
+                                id: 1
+                                name: 'product name en 1'
+                                description: 'description 1'
+                                sku: 'sku 1'
+                                link: ''
+                                technical_details: ''
+                                warranty: ''
+                                exchange_value: null
+                                exchange_policy: ''
+                                brand:
+                                  name: 'brand name en 1'
+                                  logo_image: null
+                                supplier:
+                                  name: 'supplier name en 1'
+                                images:
+                                  - main: true
+                                    image: '/product-img.png'
+                                categories: []
+                                calculated_price: 100
+                                extra_price: 9
+                                remaining_quantity: 0
+                              quantity: 2
+                            - id: 2
+                              product:
+                                id: 2
+                                name: 'product name en 2'
+                                description: 'description 1'
+                                sku: 'sku 2'
+                                link: ''
+                                technical_details: ''
+                                warranty: ''
+                                exchange_value: null
+                                exchange_policy: ''
+                                brand:
+                                  name: 'brand name en 1'
+                                  logo_image: null
+                                supplier:
+                                  name: 'supplier name en 1'
+                                images:
+                                  - main: true
+                                    image: '/product-img.png'
+                                categories: []
+                                calculated_price: 507
+                                extra_price: 0
+                                remaining_quantity: 0
+                              quantity: 1
+            '404':
+              description: Cart not found
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/error'
+                  examples:
+                    example:
+                      value:
+                        success: false
+                        code: not_found
+                        message: Not found.
+                        status: 404
+
+  '/campaign/quick-offer-create-order':
+      post:
+        summary: Make Order
+        parameters:
+          - name: campaign_code
+            in: path
+            required: true
+            schema:
+              type: string
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_id:
+                    type: integer
+                    description: ID of the product to order
+                  quantity:
+                    type: integer
+                    description: Quantity of the product to order
+        responses:
+          '200':
+            description: Order placed successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    status:
+                      type: integer
+                    data:
+                      type: object
+                      properties:
+                        order_id:
+                          type: integer
+                        quantity:
+                          type: integer
+                        reference:
+                          type: integer
+                examples:
+                  example:
+                    value:
+                      success: true
+                      message: Order placed successfully
+                      status: 200
+                      data:
+                        reference: 12345
+          '400':
+            description: Request is invalid
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error'
+                examples:
+                  example:
+                    value:
+                      success: false
+                      code: request_invalid
+                      message: Request is invalid.
+                      status: 400
+                      data: {}
+          '401':
+            description: Unauthorized request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error'
+                examples:
+                  example:
+                    value:
+                      success: false
+                      code: bad_credentials
+                      message: Bad credentials.
+                      status: 401
+                      data: {}
+          '500':
+            description: Unauthorized request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error'
+                examples:
+                  example:
+                    value:
+                      success: false
+                      code: unauthorized
+                      message: Unknown error occured.
+                      status: 500
+                      data: {}
+
+  '/campaign/quick-offer-create-order':
+     get:
+        summary: Get existing order details
+        parameters:
+          - name: campaign_code
+            in: path
+            required: true
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Order details fetched successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    status:
+                      type: integer
+                    data:
+                      type: object
+                      properties:
+                        reference:
+                          type: integer
+                        order_date_time:
+                          type: string
+                        added_payment:
+                          type: boolean
+                examples:
+                  example:
+                    value:
+                      success: true
+                      message: Employee order fetched successfully.
+                      status: 200
+                      data:
+                        reference: 12345
+                        order_date_time: "2024-08-01T12:00:00.000000Z"
+                        added_payment: true
+          '401':
+            description: Unauthorized request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error'
+                examples:
+                  example:
+                    value:
+                      success: false
+                      code: bad_credentials
+                      message: Bad credentials.
+                      status: 401
+                      data: {}
+          '404':
+            description: Existing order not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/error'
+                examples:
+                  example:
+                    value:
+                      success: false
+                      message: Order not found.
+                      code: not_found
+                      status: 404
+                      data: {}
+
+  '/campaign/get-quick-offer-share/{share_id}':
+    get:
+      summary: Get quick offer share details
+      parameters:
+        - name: share_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Share details fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      share_type:
+                        type: string
+                      products:
+                        type: array
+                        items:
+                          type: object
+                      cart:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            product:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                name:
+                                  type: string
+                                description:
+                                  type: string
+                                sku:
+                                  type: string
+                                link:
+                                  type: string
+                                technical_details:
+                                  type: string
+                                  nullable: true
+                                warranty:
+                                  type: string
+                                  nullable: true
+                                exchange_value:
+                                  type: number
+                                exchange_policy:
+                                  type: string
+                                  nullable: true
+                                product_type:
+                                  type: string
+                                product_kind:
+                                  type: string
+                                brand:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    logo_image:
+                                      type: string
+                                      nullable: true
+                                supplier:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                images:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      main:
+                                        type: boolean
+                                      image:
+                                        type: string
+                                categories:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: integer
+                                      name:
+                                        type: string
+                                      icon_image:
+                                        type: string
+                                        nullable: true
+                                      order:
+                                        type: integer
+                                calculated_price:
+                                  type: number
+                                remaining_quantity:
+                                  type: integer
+                            quantity:
+                              type: integer
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Share details fetched successfully.
+                    status: 200
+                    data:
+                      share_type: Cart
+                      products: []
+                      cart:
+                        products:
+                          - id: 4
+                            product:
+                              id: 1
+                              name: oven en
+                              description: n
+                              sku: prod_oven
+                              link: ""
+                              technical_details: null
+                              warranty: null
+                              exchange_value: 10
+                              exchange_policy: null
+                              product_type: REGULAR
+                              product_kind: PHYSICAL
+                              brand:
+                                name: brand name en
+                                logo_image: null
+                              supplier:
+                                name: Hassam Hassan
+                              images:
+                                - main: true
+                                  image: /media/92668899-830d-43c9-941c-db78a1b6dc9f.png
+                              categories:
+                                - id: 1
+                                  name: category en
+                                  icon_image: null
+                                  order: 0
+                              calculated_price: 10
+                              remaining_quantity: 9999996
+                            quantity: 2
+        '404':
+          description: Offer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Offer not found.
+                    code: not_found
+                    status: 404
+                    data: {}
+        '500':
+          description: Internal server error
+
+  '/campaign/quick-offer-product/{product_id}':
+    get:
+      summary: Get quick offer product details
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X-Authorization
+          in: header
+          required: true
+          description: Bearer token for authentication
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      description:
+                        type: string
+                      sku:
+                        type: string
+                      link:
+                        type: string
+                      technical_details:
+                        type: string
+                        nullable: true
+                      warranty:
+                        type: string
+                        nullable: true
+                      exchange_value:
+                        type: number
+                      exchange_policy:
+                        type: string
+                        nullable: true
+                      product_type:
+                        type: string
+                      product_kind:
+                        type: string
+                      brand:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          logo_image:
+                            type: string
+                            nullable: true
+                      supplier:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                      images:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            main:
+                              type: boolean
+                            image:
+                              type: string
+                      categories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            icon_image:
+                              type: string
+                              nullable: true
+                            order:
+                              type: integer
+                      calculated_price:
+                        type: number
+                      remaining_quantity:
+                        type: integer
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Product fetched successfully.
+                    status: 200
+                    data:
+                      id: 1
+                      name: oven he
+                      description: n
+                      sku: prod_oven
+                      link: "https://www.wikipedia.org/"
+                      technical_details: null
+                      warranty: null
+                      exchange_value: 10
+                      exchange_policy: null
+                      product_type: REGULAR
+                      product_kind: MONEY
+                      brand:
+                        name: brand name he
+                        logo_image: null
+                      supplier:
+                        name: Hassam Hassan
+                      images:
+                        - main: true
+                          image: /media/92668899-830d-43c9-941c-db78a1b6dc9f.png
+                      categories:
+                        - id: 1
+                          name: category he
+                          icon_image: null
+                          order: 0
+                      calculated_price: 8
+                      remaining_quantity: 10000000
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: bad_credentials
+                    message: Bad credentials.
+                    status: 401
+                    data: {}
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Product not found.
+                    code: not_found
+                    status: 404
+                    data: {}
+  '/campaign/quick-offer-share':
+    post:
+      summary: Share products for quick offer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                share_type:
+                  type: string
+                product_ids:
+                  type: array
+                  items:
+                    type: string
+              example:
+                share_type: "Cart"
+                product_ids: []
+      parameters:
+        - name: X-Authorization
+          in: header
+          required: true
+          description: Bearer token for authentication
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Products shared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      share_id:
+                        type: string
+              examples:
+                example:
+                  value:
+                    success: true
+                    message: Products shared successfully.
+                    status: 200
+                    data:
+                      share_id: "7a42d3aa-63de-494d-884c-236104e9c166"
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: bad_credentials
+                    message: Bad credentials.
+                    status: 401
+                    data: {}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    message: Invalid input data.
+                    status: 400
+                    data: {}
+  '/campaign/quick-offer-order':
+    get:
+      summary: Fetch quick offer order details
+      description: Endpoint to fetch details of a quick offer order.
+      parameters:
+        - name: X-Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Bearer token for authorization
+      responses:
+        '200':
+          description: Quick offer order details fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      full_name:
+                        type: string
+                        description: Full name of the recipient
+                      reference:
+                        type: integer
+                        description: Reference number for the order
+                      order_date_time:
+                        type: string
+                        format: date-time
+                        description: Date and time when the order was placed
+                      products:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            quantity:
+                              type: integer
+                              description: Quantity of the product
+                            product:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                name:
+                                  type: string
+                                description:
+                                  type: string
+                                sku:
+                                  type: string
+                                link:
+                                  type: string
+                                technical_details:
+                                  type: string
+                                warranty:
+                                  type: string
+                                exchange_value:
+                                  type: integer
+                                exchange_policy:
+                                  type: string
+                                product_type:
+                                  type: string
+                                product_kind:
+                                  type: string
+                                brand:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    logo_image:
+                                      type: string
+                                supplier:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                images:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      main:
+                                        type: boolean
+                                      image:
+                                        type: string
+                                categories:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: integer
+                                      name:
+                                        type: string
+                                      icon_image:
+                                        type: string
+                                        nullable: true
+                                      order:
+                                        type: integer
+                                calculated_price:
+                                  type: integer
+                                remaining_quantity:
+                                  type: integer
+                                special_offer:
+                                  type: string
+                                variations:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      variation_kind:
+                                        type: string
+                                      system_name:
+                                        type: string
+                                      site_name:
+                                        type: string
+                                      color_variation:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            name:
+                                              type: string
+                                            color_code:
+                                              type: string
+                                            image:
+                                              type: string
+                                      text_variation:
+                                        type: array
+                                        items:
+                                          type: object
+                              required:
+                                - id
+                                - name
+                                - description
+                            total_cost:
+                              type: integer
+                            variations:
+                              type: object
+                              additionalProperties:
+                                type: string
+                      phone_number:
+                        type: string
+                      additional_phone_number:
+                        type: string
+                      delivery_city:
+                        type: string
+                      delivery_street:
+                        type: string
+                      delivery_street_number:
+                        type: string
+                      delivery_apartment_number:
+                        type: string
+                      delivery_additional_details:
+                        type: string
+                examples:
+                  example:
+                    value:
+                      success: true
+                      message: Quick offer order fetched successfully.
+                      status: 200
+                      data:
+                        full_name: "Hassam Hassan"
+                        reference: 2
+                        order_date_time: "2024-11-19T10:23:18.957601Z"
+                        products:
+                          - quantity: 1
+                            product:
+                              id: 234
+                              name: "duplicate_duplicate_oven small en"
+                              description: "Description en"
+                              sku: "duplicate__9d68f87b-98e3-4876-89d2-f4568438fbc9"
+                              link: ""
+                              technical_details: "Technical details en"
+                              warranty: "Warranty [en]"
+                              exchange_value: 15
+                              exchange_policy: "Exchange policy [en]"
+                              product_type: "REGULAR"
+                              product_kind: "PHYSICAL"
+                              brand:
+                                name: "brand name en"
+                                logo_image: "/media/5a146631-b2c1-4b3c-895f-12357766e172.png"
+                              supplier:
+                                name: "Hassam Hassan en"
+                              images:
+                                - main: true
+                                  image: "/media/2caae306-4652-4bc3-8172-7691d9ad843e.jpg"
+                              categories: []
+                              calculated_price: 10
+                              remaining_quantity: 2147483646
+                              special_offer: "Special Offer"
+                              variations: []
+                            total_cost: 10
+                            variations:
+                              Color: "Red"
+                          - quantity: 1
+                            product:
+                              id: 1
+                              name: "oven en"
+                              description: "Description en"
+                              sku: "oven_1"
+                              link: ""
+                              technical_details: "Technical details en"
+                              warranty: "Warranty [en]"
+                              exchange_value: 15
+                              exchange_policy: "Exchange policy [en]"
+                              product_type: "REGULAR"
+                              product_kind: "VARIATION"
+                              brand:
+                                name: "brand name en"
+                                logo_image: "/media/5a146631-b2c1-4b3c-895f-12357766e172.png"
+                              supplier:
+                                name: "Hassam Hassan en"
+                              images:
+                                - main: true
+                                  image: "/media/2c9b8c9e-0f90-431e-9e35-19014c19ac72.jpg"
+                              categories:
+                                - id: 1
+                                  name: "category en"
+                                  icon_image: null
+                                  order: 0
+                              calculated_price: 10
+                              remaining_quantity: 2147483644
+                              special_offer: "Special Offer"
+                              variations:
+                                - variation_kind: "COLOR"
+                                  system_name: "Product Color en"
+                                  site_name: "Product Color en"
+                                  color_variation:
+                                    - name: "Black"
+                                      color_code: "#000000"
+                                      image: "/media/c331ccd6-f054-4b1f-9652-db6a3a92022f.jpg"
+                                  text_variation: []
+                            total_cost: 10
+                            variations:
+                              Color: "Red"
+                        phone_number: "10501234567"
+                        additional_phone_number: "10501234567"
+                        delivery_city: "Abbirim"
+                        delivery_street: "Jail Road"
+                        delivery_street_number: "4"
+                        delivery_apartment_number: "3"
+                        delivery_additional_details: "11111111111"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: invalid_request
+                    message: Invalid request.
+                    status: 400
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                invalid_token:
+                  value:
+                    success: false
+                    code: invalid_token
+                    message: Invalid authorization token.
+                    status: 401
+                    data: {}
+    post:
+      summary: Place a quick offer order
+      description: Endpoint to place a quick offer order with delivery details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                  description: Full name of the recipient
+                phone_number:
+                  type: string
+                  description: Primary phone number of the recipient
+                additional_phone_number:
+                  type: string
+                  description: Additional phone number of the recipient
+                delivery_city:
+                  type: string
+                  description: City for delivery
+                delivery_street:
+                  type: string
+                  description: Street for delivery
+                delivery_street_number:
+                  type: string
+                  description: Street number for delivery
+                delivery_apartment_number:
+                  type: string
+                  description: Apartment number for delivery
+                delivery_additional_details:
+                  type: string
+                  description: Additional delivery details
+              required:
+                - full_name
+                - phone_number
+                - delivery_city
+                - delivery_street
+                - delivery_street_number
+                - delivery_apartment_number
+      responses:
+        '200':
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      reference:
+                        type: integer
+                        description: Reference number for the order
+                examples:
+                  example:
+                    value:
+                      success: true
+                      message: Order placed successfully.
+                      status: 200
+                      data:
+                        reference: 2
+        '400':
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: invalid_payload
+                    message: The request payload is invalid.
+                    status: 400
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                invalid_token:
+                  value:
+                    success: false
+                    code: invalid_token
+                    message: The provided authorization token is invalid.
+                    status: 401
+                    data: {}
+                missing_token:
+                  value:
+                    success: false
+                    code: missing_token
+                    message: Authorization token is missing.
+                    status: 401
+                    data: {}
+
+  '/campaign/quick-offer-cancel-order/{reference}':
+    put:
+      summary: Cancel a quick offer order
+      description: Endpoint to cancel a quick offer order by its reference number.
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The reference number of the order to be canceled
+        - name: X-Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Bearer token for authorization
+      responses:
+        '200':
+          description: Order canceled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    description: Empty object as no additional data is returned
+                examples:
+                  example:
+                    value:
+                      success: true
+                      message: "order canceled successfully."
+                      status: 200
+                      data: {}
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: invalid_request
+                    message: Invalid request parameters.
+                    status: 400
+                    data: {}
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                example:
+                  value:
+                    success: false
+                    code: order_not_found
+                    message: Order with the given reference does not exist.
+                    status: 404
+                    data: {}
+        '401':
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              examples:
+                invalid_token:
+                  value:
+                    success: false
+                    code: invalid_token
+                    message: Invalid authorization token.
+                    status: 401
+                    data: {}
+                missing_token:
+                  value:
+                    success: false
+                    code: missing_token
+                    message: Authorization token is missing.
+                    status: 401
+                    data: {}

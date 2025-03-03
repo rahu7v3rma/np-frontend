@@ -3,29 +3,37 @@
 import { Button, Tooltip } from '@nextui-org/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useState, useRef, useCallback, useContext } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
 
+import OrderDetails from '@/app/[locale]/(navbar)/[campaign_code]/order/details/page';
+import { CartContext } from '@/app/[locale]/context/cart';
 import { useCurrentLocale, useI18n } from '@/locales/client';
+import { getList, fetchOrderDetails } from '@/services/api';
 import ConfirmationModal from '@/shared/modal';
 import { CUSTOMER_SERVICE_WHATSAPP_NUMBER } from '@/utils/const';
-import downloadPDF from '@/utils/downloadPdf';
+import { generateCartProductsPDF } from '@/utils/downloadPdf';
+
+import { CampaignContext } from '../../context/campaign';
 
 type Props = {
   paymentAdded: boolean;
   onConfirmExchange: () => void;
+  quickOffer?: boolean;
 };
 
 export default function CheckoutComplete({
   paymentAdded,
   onConfirmExchange,
+  quickOffer,
 }: Props) {
   const t = useI18n();
   const locale = useCurrentLocale();
-  const router = useRouter();
-  const currentPath = usePathname();
   const [isOpen, setIsopen] = useState<boolean>(false);
+  const [isOrderDownloading, setIsOrderDownloading] = useState(false);
+  const orderDetailsRef = useRef<HTMLDivElement>(null);
+  const { includedTax } = useContext(CartContext);
+  const { campaignType, campaignDetails } = useContext(CampaignContext);
 
   const handleExchangeGiftConfirm = useCallback(() => {
     setIsopen(false);
@@ -37,6 +45,22 @@ export default function CheckoutComplete({
       onConfirmExchange();
     }
   }, [paymentAdded, onConfirmExchange]);
+
+  const handleDownload = async () => {
+    if (campaignType === 'quick_offer_code') {
+      const cartProductsList = await getList(locale, includedTax);
+      setIsOrderDownloading(true);
+      generateCartProductsPDF(cartProductsList?.products);
+      setTimeout(() => setIsOrderDownloading(false), 3000);
+    } else {
+      const cartProductsList = await fetchOrderDetails(
+        campaignDetails?.code ?? '',
+      );
+      setIsOrderDownloading(true);
+      generateCartProductsPDF(cartProductsList.products);
+      setTimeout(() => setIsOrderDownloading(false), 3000);
+    }
+  };
 
   return (
     <>
@@ -53,16 +77,20 @@ export default function CheckoutComplete({
             <div className="h-12 flex items-center justify-center">
               <Tooltip
                 content={t('button.downloadGift')}
-                className={
-                  'bg-neutral-900 text-white px-1.5 py-1 rounded-md	text-xs	font-normal	leading-4 text-center items-center justify-center'
-                }
+                color="primary"
+                showArrow
+                offset={0}
+                classNames={{
+                  content: 'text-xs',
+                }}
               >
                 <Button
                   isIconOnly
                   variant="light"
                   aria-label="Download"
                   className="h-12 w-12"
-                  onPress={() => downloadPDF(`${currentPath}/details`)}
+                  onPress={() => handleDownload()}
+                  isLoading={isOrderDownloading}
                 >
                   <Image
                     src="/drop.svg"
@@ -78,17 +106,21 @@ export default function CheckoutComplete({
               dir={locale === 'he' ? 'rtl' : 'ltr'}
               className="flex flex-row justify-around gap-2 md:gap-4"
             >
-              <Button
-                variant="bordered"
-                size="lg"
-                startContent={
-                  locale === 'he' ? <FaChevronRight /> : <FaChevronLeft />
-                }
-                className="text-sm font-bold px-2 border-1 md:w-[166px]"
-                onClick={() => setIsopen(true)}
-              >
-                {t('button.exchangeGift')}
-              </Button>
+              {campaignType !== 'wallet' && (
+                <Button
+                  variant="bordered"
+                  size="lg"
+                  startContent={
+                    locale === 'he' ? <FaChevronRight /> : <FaChevronLeft />
+                  }
+                  className="sm:text-sm text-[12px] font-bold px-2 border-1 md:w-[166px]"
+                  onClick={() => setIsopen(true)}
+                >
+                  {quickOffer
+                    ? t('button.changeList')
+                    : t('button.exchangeGift')}
+                </Button>
+              )}
               <Button
                 as={Link}
                 href={`https://wa.me/${CUSTOMER_SERVICE_WHATSAPP_NUMBER}`}
@@ -103,15 +135,21 @@ export default function CheckoutComplete({
                     height={24}
                   />
                 }
-                className="text-sm font-bold px-2 md:w-[192px]"
+                className="sm:text-sm text-[12px] font-bold px-2 md:w-[192px]"
               >
-                {t('button.customerService')}
+                {quickOffer
+                  ? t('button.talkWith')
+                  : t('button.customerService')}
               </Button>
             </div>
           </div>
         </div>
         <ConfirmationModal
-          onConfirm={handleExchangeGiftConfirm}
+          onConfirm={
+            campaignType === 'quick_offer_code'
+              ? onConfirmExchange
+              : handleExchangeGiftConfirm
+          }
           isOpenModal={isOpen}
           onClose={() => setIsopen(false)}
           title={t('button.exchangeGift')}
@@ -140,6 +178,12 @@ export default function CheckoutComplete({
             ) : undefined
           }
         />
+      </div>
+      {/* Hacky Workaround: In order to get the component downloaded, it needs to be in DOM, 
+      so keeping it here as hidden and it will be processed when the user 
+      wants to download order page */}
+      <div ref={orderDetailsRef} style={{ display: 'none' }}>
+        <OrderDetails />
       </div>
     </>
   );

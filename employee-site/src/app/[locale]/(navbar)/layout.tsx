@@ -4,11 +4,12 @@ import { usePathname } from 'next/navigation';
 
 import { CampaignWrapper } from '../context/campaign';
 import { CartWrapper } from '../context/cart';
+import { ProductWrapper } from '../context/product';
 
 import Footer from './_components/footer';
 import NavBar from './_components/navBar';
 
-const NavbarLayout = async ({
+const NavbarLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -19,9 +20,13 @@ const NavbarLayout = async ({
   return (
     <CampaignWrapper>
       <CartWrapper>
-        {noNavBar ? null : <NavBar />}
-        <main className="py-4 md:py-10">{children}</main>
-        <Footer />
+        <ProductWrapper>
+          <div className="flex flex-col h-full">
+            {noNavBar ? null : <NavBar />}
+            <main className="py-4 md:py-10 flex-1">{children}</main>
+            <Footer />
+          </div>
+        </ProductWrapper>
       </CartWrapper>
     </CampaignWrapper>
   );

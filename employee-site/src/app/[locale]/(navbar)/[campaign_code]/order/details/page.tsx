@@ -1,117 +1,121 @@
 'use client';
 
-import { Button } from '@nextui-org/react';
-import { PDFViewer } from '@react-pdf/renderer';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { BsQrCode } from 'react-icons/bs';
+import QRCode from 'qrcode.react';
+import { useContext, useEffect, useState } from 'react';
 
-import {
-  I18nProviderClient,
-  useCurrentLocale,
-  useI18n,
-} from '@/locales/client';
+import { CampaignContext } from '@/app/[locale]/context/campaign';
+import { useCurrentLocale, useI18n } from '@/locales/client';
+import { getOrderDetails } from '@/services/api';
+import { Order } from '@/types/order';
 
-import OrderDocument from '../_components/orderDocument';
+import { DeliveryAddress } from '../_components/address';
+import { OrderDetailsSkeleton } from '../skeletons';
 
-export default function OrderDetails({
-  params,
-}: {
-  params: {
-    orderId: string;
-  };
-}) {
+export default function OrderDetails() {
   const t = useI18n();
   const locale = useCurrentLocale();
-  const orderId = params.orderId;
+  const { campaignDetails } = useContext(CampaignContext);
 
-  const PDFDownloadLink = dynamic(
-    () => import('@react-pdf/renderer').then((mod) => mod.PDFDownloadLink),
-    {
-      ssr: false,
-    },
-  );
+  const [currentUrl, setCurrentUrl] = useState<string>('');
+  const [totalGiftPrice, setTotalGiftPrice] = useState<number | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
+  const [isOrderFetching, setIsOrderFetching] = useState<boolean>(true);
 
-  // TODO: Need to fetch order details dynamically
-  const products = [
-    {
-      quantity: 1,
-      image: '/kitchen-icon.svg',
-      name: 'Product name',
-      description: 'Lorem ipsum dolor sit amet, consectetur',
-    },
-  ];
+  useEffect(() => {
+    const totalPrice = order?.products?.reduce((total, productCart) => {
+      const { extra_price } = productCart.product;
+      const additionalCost = extra_price > 0 ? extra_price : 0;
+      return total + additionalCost * productCart.quantity;
+    }, 0);
+    setTotalGiftPrice(totalPrice || null);
+  }, [order]);
+
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      if (!campaignDetails?.code) return;
+      setIsOrderFetching(true);
+      const order = await getOrderDetails(campaignDetails?.code || '', locale);
+      setOrder(order);
+      setIsOrderFetching(false);
+    };
+
+    if (typeof window !== 'undefined') {
+      const currentUrl = `${window.location.origin}`;
+      setCurrentUrl(currentUrl);
+    }
+
+    fetchOrderDetails();
+  }, [campaignDetails?.code, locale]);
+
+  if (isOrderFetching) {
+    return (
+      <div className="w-full lg:max-w-lg p-4 mx-auto flex flex-col items-center">
+        <OrderDetailsSkeleton />;
+      </div>
+    );
+  }
 
   return (
     <div className="w-full lg:max-w-lg p-4 mx-auto flex flex-col items-center">
-      {/* Render this to check how order document looks in pdf */}
-      {/* <PDFViewer style={{ height: 600, width: 600 }}>
-        <I18nProviderClient locale={locale}>
-          <OrderDocument locale={locale} />
-        </I18nProviderClient>
-      </PDFViewer> */}
       <h4 className="text-2xl font-bold">{t('order.greeting')}</h4>
-      <h4 className="text-2xl font-bold">{orderId}</h4>
+      <h4 className="text-2xl font-bold mt-2">{order?.reference || ''}</h4>
       <div className="flex flex-col justify-center items-center my-5">
-        <BsQrCode size="4rem" />
-        <div className="mt-2">{t('order.scancode')}</div>
+        <QRCode
+          value={`${currentUrl}/${campaignDetails?.code}/order`}
+          size={70}
+        />
+        <div className="text-gray-600 mt-2">{t('order.scancode')}</div>
       </div>
-      <p className="my-6 text-center">{t('order.greetingDescription')}</p>
+      <span className="text-md text-center text-gray-700 my-6">
+        {t('order.greetingDescription')}
+      </span>
 
       <div className="w-full md:w-96">
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-md shadow-grey-400 divide-y-2 divide-dashed">
           <div>
-            {products.map((product) => (
-              <div key={product?.name} className="mb-4">
+            {(order?.products || []).map((product) => (
+              <div key={product.product.name} className="mb-6">
                 <h4 className="text-primary text-lg font-bold">
-                  {product?.quantity} {t('common.item')}
+                  {product.quantity} {t('common.item')}
                 </h4>
-                <div className="flex gap-4 mt-8">
-                  <div className="bg-gray-100 p-4 w-[96px] h-[96px] rounded-lg">
-                    {product?.image && (
+                <div className="flex gap-4 mt-3">
+                  <div className="w-[96px] h-[96px]">
+                    {product.product?.images.length > 0 && (
                       <Image
-                        src={product?.image}
-                        alt={'Product Image'}
-                        width={96}
+                        src={product.product.images[0].image}
                         height={96}
+                        width={96}
+                        alt="product image"
+                        className="rounded-2xl"
                       />
                     )}
                   </div>
                   <p className="flex-1 text-primary-100 font-sm mr-4">
-                    {product?.name} - {product?.description}
+                    {product.product.name}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="flex justify-between font-semibold py-4">
-            <p>{t('common.total')}</p>
-            <p>{t('currencySymbol')} 384</p>
-          </div>
-          <div className="py-4">
-            <p className="font-semibold">{t('order.officeDelivery')}</p>
-            <p className="text-sm text-primary-100 mt-2">
-              {t('order.officeDeliveryDescription')}
-            </p>
-          </div>
+          {totalGiftPrice ? (
+            <div className="flex justify-between font-semibold py-4">
+              <p>{t('common.total')}</p>
+              <p>
+                {t('currencySymbol')} {totalGiftPrice}
+              </p>
+            </div>
+          ) : null}
+          {campaignDetails && order ? (
+            <div className="py-4">
+              <DeliveryAddress
+                campaignDetails={campaignDetails}
+                order={order}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
-      <PDFDownloadLink
-        document={
-          <I18nProviderClient locale={locale}>
-            <OrderDocument locale={locale} />
-          </I18nProviderClient>
-        }
-        fileName={'order1.pdf'}
-      >
-        {({ blob, url, loading, error }) =>
-          loading ? null : (
-            <Button color="primary" className="my-4">
-              Download Order PDF
-            </Button>
-          )
-        }
-      </PDFDownloadLink>
     </div>
   );
 }

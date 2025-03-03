@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    @apply appearance-none;
+  }
+}
+
 .overflow-x-auto::-webkit-scrollbar {
   display: none;
 }
@@ -33,4 +40,15 @@
 
 .search-select-custom div div {
   height: 50px !important;
+}
+
+.flag-arrow {
+  .PhoneInputCountryIcon,
+  .PhoneInputCountryIcon--border {
+    margin: 6px
+  }
+}
+
+.custom-border .w-full .tap-highlight-transparent{
+  border: 1px solid #BDBDBD7A; 
 }

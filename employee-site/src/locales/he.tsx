@@ -2,10 +2,12 @@ export default {
   products: {
     additional: 'תוספת תשלום',
     value: 'שווי החלפה',
+    money_value: 'שווי שובר',
     out_of_stock: 'נגמר במלאי',
     name: 'שם המוצר - ורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית גולר מונפרר סוברט לורם שבצק יהול',
     description:
       'לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית גולר מונפרר סוברט לורם שבצק יהול, לכנוץ בעריר גק ליץ, ושבעגט ליבם סולגק. בראיט ולחת צורק מונחף, בגורמי מגמש. תרבנך וסתעד לכנו סתשם השמה - לתכי מורגם בורק? לתיג ישבעס.לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית גולר מונפרר סוברט לורם שבצק יהול.',
+    specialOffer: 'מבצע מיוחד',
   },
   All: 'הכל',
   'In Budget': 'בתקציב',
@@ -29,7 +31,7 @@ export default {
       phoneModePlaceholder: 'מספר טלפון',
       emailModeDescription: 'הכנס את אימייל העבודה שלך, קבל קוד והתחבר.',
       emailModePlaceholder: 'אימייל העבודה שלך',
-      idModeDescription: 'הכנס את ת.ז שלך והתחבר.',
+      idModeDescription: 'הכנס ת.ז / מספר עובד בהתאם להנחיות החברה והתחבר.',
       idModePlaceholder: 'ת.ז שלך',
       buttonText: 'התחבר',
       ValidEmail: 'נא להזין דוא"ל חוקי',
@@ -57,14 +59,20 @@ export default {
     cancel: 'ביטול',
     continue: 'המשך כך',
     confirm: 'אישור',
+    ok: 'בְּסֵדֶר',
     exchangeGift: 'להחליף מתנה',
+    changeList: 'שנה רשימה',
     customerService: 'שירות לקוחות',
+    talkWith: 'דבר עם ה-CSM שלי',
     downloadGift: 'הורד את סיכום ההזמנה',
     gift: 'אני רוצה את המתנה',
+    quickGift: 'הוסף לרשימה שלי',
     deleteGift: 'מחק מתנה',
     uncheck: 'בטל סימון',
+    sendMyList: 'שליחת הרשימה שלי ',
   },
   currencySymbol: '₪',
+  moneySymbol: '%',
   value: 'שווי',
   footer: {
     legal: 'משפטי',
@@ -87,6 +95,14 @@ export default {
     back: 'חזרה',
     information: 'מידע נוסף',
     linkCopied: 'הקישור הועתק',
+    filter: 'פילטר',
+    filters: 'פילטר',
+  },
+  sidebar: {
+    sort: 'הצג לפי',
+    subcategory: 'תת קטגוריה',
+    'high-to-low': 'מהמחיר הגבוהה לנמוך',
+    'low-to-high': 'מהמחיר הנמוך לגבוהה',
   },
   productDetails: {
     description: 'תיאור',
@@ -113,9 +129,15 @@ export default {
     street: 'רחוב',
     number: 'מספר',
     apartment: 'מספר דירה',
+    country: 'מדינה',
+    stateCode: 'קוד מדינה',
+    zipCode: 'מיקוד',
+    size: 'מידה (אם רלוונטי)',
+    color: 'צבע (אם רלוונטי)',
     moreDetails: 'פרטים נוספים',
     back_to_home_page: 'חזרה לעמוד הראשי',
     thanks: 'תודה על ההזמנה!',
+    quickOfferThanks: 'תודה על שיתוף הפעולה! נהיה בקשר ממש בקרוב :)',
     content:
       'מומלץ להוריד ולשמור את אישור ההזמנה כקובץ בלחיצה על כפתור ההורדה שנמצא מתחת. כמו כן, ניתן להחליף מתנה בלחיצה על "להחליף מתנה" וזאת עד למועד סגירת אתר הבחירה, למעט החלפת מתנות בתוספת תשלום אשר תבוצע בפניה אל "שירות הלקוחות" של ניקלס.',
     warning: 'אתם בטוחים שתרצו לשנות את המתנה?',
@@ -129,54 +151,87 @@ export default {
     deliveryCityErrMsg: 'אנא בחר עיר',
     deliveryStreetErrMsg: 'אנא הכנס שם רחוב תקף',
     deliveryStreetNumberErrMsg: 'אנא הכנס מספר רחוב חיובי',
+    countryErrMsg: 'נא להזין מדינה',
+    stateCodeErrMsg: 'נא להזין קוד מדינה',
+    zipCodeErrMsg: 'נא להזין מיקוד',
     notification: 'מוצר זה יישלח ישירות לבית העובד.',
+    voucherPhoneNumber: 'הוסיפו טלפון בשביל השובר',
   },
   order: {
     scancode: 'סרקו לעמוד ההזמנות באתר',
     greeting: 'תודה על ההזמנה!',
     greetingDescription:
       'מומלץ להוריד ולשמור את אישור ההזמנה כקובץ בלחיצה על כפתור ההורדה שנמצא מתחת. כמו כן, ניתן להחליף מתנה בלחיצה על "להחליף מתנה" וזאת עד למועד סגירת אתר הבחירה, למעט החלפת מתנות בתוספת תשלום אשר תבוצע בפניה אל "שירות הלקוחות" של ניקלס.',
+    homeDelivery: 'משלוח לבית',
     officeDelivery: 'משלוח למשרדים',
-    officeDeliveryDescription:
-      'לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית גולר מונפרר סוברט לורם שבצק יהול, לכנוץ בעריר גק ליץ, ושבעגט ליבם סולגק. בראיט ולחת צורק מונחף, בגורמי מגמש.',
     success: 'ההזמנה בוצעה בהצלחה!',
     cancelSuccess: 'ההזמנה בוטלה בהצלחה!',
     somethingWentWrong: 'משהו השתבש. אנא נסו שנית',
     summary: 'סיכום הזמנה',
+    offerSummary: 'סיכום הזמנה ',
     giftPrice: 'עלות המתנות',
     budget: 'תקציב למימוש',
+    points: 'נקודות',
     budgetLeft: 'תקציב נותר',
+    pointsLeft: 'נקודות שמאל',
     linkCopied: 'הקישור הועתק',
+    deleteItem: 'סמל מחק',
   },
   myOrder: 'לצפייה בהזמנה שלי',
+  myList: 'הרשימה שלי',
+  myListDescription:
+    'היי, ראינו שכבר שלחתם רשימה להצעת מחיר, אל דאגה! אתם יכולים לראות או לשנות אותה כאן.',
   myOrderDescription:
     'היי! כבר בחרת מתנה, לצפייה בהזמנה או החלפת המתנה יש להיכנס למסך ההזמנה',
   customerServiceDialog: {
-    title: 'מידע נוסף',
+    // title: 'מידע נוסף',
+    // description:
+    //   'ברוכים הבאים לאתר המתנות לחג, להלן מידע חיוני לבחירת המתנות לחג:',
+    // giftSelectionTitle: 'בחירת מתנות:',
+    // giftSelectionDescriptionPointOne:
+    //   'הנך מוזמנ/ת להתרשם מתוך מגוון המתנות המוצעות באתר ולבחור את המתנה שאהבת.',
+    // giftSelectionDescriptionPointTwo:
+    //   'שימו לב – ישנה אפשרות לשלוח ולשתף את המוצר עם חברים / משפחה על מנת להתייעץ באמצעות לחיצה על כפתור "שיתוף" יד כפתור "אני רוצה את המתנה".',
+    // giftSelectionDescriptionPointThree:
+    //   'לאחר שבחרת את המתנה הרצויה תגיע למסך סיכום הזמנה. אנא ודא/י כי כל הפרטים נכונים ובמידת הצורך הזן/י את הפרטים הרלוונטים לשילוח.',
+    // giftSelectionDescriptionPointFour:
+    //   'בסיום התהליך יופיע מסך סיכום הזמנה. מומלץ להוריד ולשמור את קובץ ה PDF מקרים עתידיים. ',
+    // replaceChoicesTitle: 'שינוי והחלפת בחירה:',
+    // replaceChoicesDescription:
+    //   'ניתן לשנות את בחירת המתנה בכל עת, עד למועד סגירת האתר, באמצעות לחיצה בעמוד בחירת המתנה על "לצפייה בהזמנה שלי" ולאחר מכן "להחליף מתנה". הבחירה האחרונה היא זו שקובעת. ',
+    // replaceChoicesDescriptionTwo:
+    //   'שינוי מתנה בתוספת תשלום יתבצע באמצעות פנייה ישירה לשירות הלקוחות של ניקלס שיבצע החזר במקום ופתיחה מחדש של אפשרות הבחירה.',
+    // giftWithPaymentTitle: 'מוצרים בשווי החלפה:',
+    // giftWithPaymentDescriptionPointOne:
+    //   'מוצרים בקטגוריות טקסטיל ומטבח ניתנים להחלפה בסניפי הרשתות השונות. ניתן להחליף את המתנה שהתקבלה רק על פי תנאי שובר ההחלפה המצורף ליד כל מוצר. אנא קראו בקפידה את הפרטים המופעים בכל מוצר ואפשרויות ההחלפה בכדי למנוע אי נעימויות בהגעתכם/ן לרשתות השונות.',
+    // giftWithPaymentDescriptionPointTwo:
+    //   'בנוסף, כפי שצוין מעלה, כל מתנה יכולה למעשה להפוך להיות "תוספת תשלום", שכן מדובר על "סל" מתנות שמרכיב את השלם.לדוגמא: אם קיימים 700 מטבעות, ובחרתם-ן כבר מתנה ב-700, אז המתנה הנוספת שתבחרו, תהיה התוספת שלכם',
+    // importantNoteTitle: 'שילוח המתנה:',
+    // importantNoteDescription:
+    //   'לקבלת מידע אודות זמני הגעת המתנה אנא התעדכנו מול מנהל/ת הרווחה של הארגון לפי מה שסוכם מראש עם חברת ניקלס.',
+    title: 'Additional Information',
     description:
-      'ברוכים הבאים לאתר המתנות לחג, להלן מידע חיוני לבחירת המתנות לחג:',
-    giftSelectionTitle: 'בחירת מתנות:',
+      'Below is useful information regarding the selection of swag gifts from the website',
+    giftSelectionTitle: 'Choosing gifts:',
     giftSelectionDescriptionPointOne:
-      'הנך מוזמנ/ת להתרשם מתוך מגוון המתנות המוצעות באתר ולבחור את המתנה שאהבת.',
-    giftSelectionDescriptionPointTwo:
-      'שימו לב – ישנה אפשרות לשלוח ולשתף את המוצר עם חברים / משפחה על מנת להתייעץ באמצעות לחיצה על כפתור "שיתוף" יד כפתור "אני רוצה את המתנה".',
+      'You are welcome to take a look at the variety of gifts offered on the website and choose the gift you like.',
+    giftSelectionDescriptionPointTwo: `Please note - there is an option to send and share the product with friends / family in order to consult by clicking the "Share" button next to the "I want the gift" button.`,
     giftSelectionDescriptionPointThree:
-      'לאחר שבחרת את המתנה הרצויה תגיע למסך סיכום הזמנה. אנא ודא/י כי כל הפרטים נכונים ובמידת הצורך הזן/י את הפרטים הרלוונטים לשילוח.',
+      'After you have selected the desired gift, you will reach the order summary screen. Please make sure that all the details are correct and, if necessary, enter the relevant details for shipping.',
     giftSelectionDescriptionPointFour:
-      'בסיום התהליך יופיע מסך סיכום הזמנה. מומלץ להוריד ולשמור את קובץ ה PDF מקרים עתידיים. ',
-    replaceChoicesTitle: 'שינוי והחלפת בחירה:',
-    replaceChoicesDescription:
-      'ניתן לשנות את בחירת המתנה בכל עת, עד למועד סגירת האתר, באמצעות לחיצה בעמוד בחירת המתנה על "לצפייה בהזמנה שלי" ולאחר מכן "להחליף מתנה". הבחירה האחרונה היא זו שקובעת. ',
-    replaceChoicesDescriptionTwo:
-      'שינוי מתנה בתוספת תשלום יתבצע באמצעות פנייה ישירה לשירות הלקוחות של ניקלס שיבצע החזר במקום ופתיחה מחדש של אפשרות הבחירה.',
-    giftWithPaymentTitle: 'מוצרים בשווי החלפה:',
+      'At the end of the process, an order summary screen will appear. It is recommended to download and save the PDF file for future cases.',
+    chooseVariationTitle:
+      'If necessary - please choose color and size on the gift selection page (after you click on the gift).',
+    replaceChoicesTitle: 'Changing and Replacing Choices:',
+    replaceChoicesDescription: `You can change the gift selection at any time, until the site closes, by clicking on the gifts selection page on "view my order" and then "exchange a gift". The last choice is the one that determines.`,
+    // replaceChoicesDescriptionTwo:
+    //   'Changing a gift with an additional fee will be done by contacting the Nicklas customer service directly, who will make a refund on the spot and reopen the selection option.',
+    giftWithPaymentTitle: 'Exchangeable products:',
     giftWithPaymentDescriptionPointOne:
-      'מוצרים בקטגוריות טקסטיל ומטבח ניתנים להחלפה בסניפי הרשתות השונות. ניתן להחליף את המתנה שהתקבלה רק על פי תנאי שובר ההחלפה המצורף ליד כל מוצר. אנא קראו בקפידה את הפרטים המופעים בכל מוצר ואפשרויות ההחלפה בכדי למנוע אי נעימויות בהגעתכם/ן לרשתות השונות.',
-    giftWithPaymentDescriptionPointTwo:
-      'בנוסף, כפי שצוין מעלה, כל מתנה יכולה למעשה להפוך להיות "תוספת תשלום", שכן מדובר על "סל" מתנות שמרכיב את השלם.לדוגמא: אם קיימים 700 מטבעות, ובחרתם-ן כבר מתנה ב-700, אז המתנה הנוספת שתבחרו, תהיה התוספת שלכם',
-    importantNoteTitle: 'שילוח המתנה:',
+      'It will not be possible to exchange products, please note that you choose the size and color you need.',
+    importantNoteTitle: 'Gift delivery:',
     importantNoteDescription:
-      'לקבלת מידע אודות זמני הגעת המתנה אנא התעדכנו מול מנהל/ת הרווחה של הארגון לפי מה שסוכם מראש עם חברת ניקלס.',
+      'The gifts will be delivered to your home/office address by the end of 2024.',
     furtherQuestions:
       'נציג של ניקלס יהיה זמין במהלך הימים ראשון עד חמישי בין השעות 8:00- 18:00 ויענה על כל דבר ויתן את השירות והטיפול המהירים ביותר לכל בעיה.',
   },
@@ -190,19 +245,66 @@ export default {
     quantity: 'כמות',
     total_price: 'מחיר סופי',
     budget: 'תקציב ',
+    points: 'נקודות',
+    voucher: 'שובר',
+    value: 'ערך',
+    above_budget: 'מעל התקציב',
+    above_points: 'נקודות מעל',
+    discount: 'הנחה',
     leftBudget: 'תקציב נותר',
+    leftPoints: 'שמאל תקציב',
     empty: 'העגלה שלכם ריקה התחילו להוסיף מתנות',
     giftPrice: 'עלות המתנות',
+    giftList: 'רשימת מתנות',
+    quantityExceeded: 'כמות המוצר שאתה מנסה להוסיף חורגת מהמלאי הזמין.',
     continue: 'המשיכו',
     error: 'אירעה שגיאה בעת עדכון כמות המוצר',
     success: 'כמות המוצר עודכנה בהצלחה',
     deleteProductError: 'אירעה שגיאה בעת מחיקת המוצר',
     deleteProductSuccess: 'המוצר נמחק בהצלחה',
+    subTitle: 'כמות הפריטים מגיעה לאפס',
     itemAdded: 'פריט נוסף לעגלת הקניות שלך.',
     itemNotAdded:
       'מצטערים, לא הצלחנו להוסיף את הפריט לעגלת הקניות שלך. בבקשה נסה שוב.',
+    popup:
+      'חישוב של עלות המתנות הכוללת פחות התקציב המקורי שלכם. אם העלות הכוללת גבוהה מהתקציב, תראו סכום בסיכום הכללי שמהווה תוספת תשלום לעגלה.',
+    sku: 'מק"ט',
+    addToCart: 'הוסף לעגלה',
+    totalVoucher: 'שווי כולל של שובר',
+    discountInfo: 'ההנחה ניתנת על הערך הכולל של השובר.',
   },
   categoriesBar: {
     searchErrorMessage: 'אין מוצר זמין עבור החיפוש הזה',
+    includingTax: 'כולל מע״מ',
   },
+  filter: {
+    productKind: 'סוג מוצר',
+    productKindPhysical: 'מתנות פיזית',
+    productKindMoney: 'שוברים',
+    productKindBundle: 'באנדלים',
+    productKindVariation: 'מתנות עם וריאציות',
+    color: 'צבע',
+    brand: 'מותג',
+    brandNoData: 'לא נמצאו נתונים',
+    brandSearch: 'לְחַפֵּשׂ...',
+    brandSelected: 'נִבחָר',
+    brandSearchbar: 'לְחַפֵּשׂ',
+    price: 'מחיר',
+    upgraded: 'שדרוג - תוספת תשלום',
+    free: 'ללא תוספת',
+    upgradedToast:
+      'כדי לצפות במוצרים בתוספת תשלום, עברו ללשונית "בתוספת תשלום" מעל שורת הקטגוריות',
+    budgetToast:
+      'כדי לצפות במוצרים בתקציב בלבד, לחצו על הלשונית "בתקציב" מעל שורת הקטגוריות',
+    rangeSelected: 'טווח מחירים נבחר',
+    budgetSelected: 'טווח מחירים נבחר',
+    yourBudget: 'התקציב שלך',
+    all: 'כֹּל',
+    showResults: 'הצג תוצאות',
+  },
+  offer: {
+    empty: 'העגלה שלכם ריקה התחילו להוסיף מתנות',
+    continue: 'המשיכו',
+  },
+  voucherDetails: 'פרטי השובר',
 } as const;

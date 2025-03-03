@@ -1,8 +1,9 @@
 'use client';
 import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 
+import { CampaignContext } from '@/app/[locale]/context/campaign';
 import { useI18n } from '@/locales/client';
 
 type Props = {
@@ -12,6 +13,8 @@ type Props = {
 const MyOrder: FunctionComponent<Props> = ({ campaign_code }: Props) => {
   const t = useI18n();
   const router = useRouter();
+  const { campaignType } = useContext(CampaignContext);
+
   const handleClick = () => {
     router.push(`${campaign_code}/order`);
   };
@@ -25,10 +28,12 @@ const MyOrder: FunctionComponent<Props> = ({ campaign_code }: Props) => {
     >
       <div className="flex flex-col md:flex-row items-center">
         <Button color="secondary" className="font-bold" onClick={handleClick}>
-          {t('myOrder')}
+          {campaignType === 'quick_offer_code' ? t('myList') : t('myOrder')}
         </Button>
         <p className="text-lg text-white font-bold text-center px-0 md:px-4 mx-4 md:mx-0 order-first md:order-last flex-1">
-          {t('myOrderDescription')}
+          {campaignType === 'quick_offer_code'
+            ? t('myListDescription')
+            : t('myOrderDescription')}
         </p>
       </div>
     </div>

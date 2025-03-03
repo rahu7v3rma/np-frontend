@@ -3,10 +3,13 @@
 import { Image as NextUIImage } from '@nextui-org/image';
 import { headers } from 'next/headers';
 import Image from 'next/image';
-import { userAgent } from 'next/server';
 
 import { getCurrentLocale } from '@/locales/server';
-import { getCampaignDetails } from '@/services/api';
+import {
+  getCampaignDetails,
+  getCampaignType,
+  getQuickOfferDetails,
+} from '@/services/api';
 import LoginBgSvg from '@public/login-bg.svg';
 import LogoPng from '@public/logo.png';
 
@@ -19,12 +22,19 @@ export default async function LoginPage({
 }) {
   const locale = getCurrentLocale();
 
-  const campaignDetails = await getCampaignDetails(
-    params.campaign_code,
-    locale,
-  );
+  let campaignType = null;
+  try {
+    campaignType = await getCampaignType(params.campaign_code);
+  } catch {}
 
-  const { device } = userAgent({ headers: headers() });
+  const campaignDetails =
+    campaignType === 'quick_offer_code'
+      ? await getQuickOfferDetails(params.campaign_code, locale)
+      : await getCampaignDetails(params.campaign_code, locale);
+
+  const headersList = headers();
+  const userAgent = headersList.get('user-agent') || '';
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
 
   return (
     <div className="h-screen flex flex-col lg:flex-row">
@@ -85,22 +95,39 @@ export default async function LoginPage({
               </span>
             </div>
             <Image
-              src={
-                device.type === 'mobile'
-                  ? campaignDetails.login_page_mobile_image
-                  : campaignDetails.login_page_image
-              }
-              alt="login_page_image"
+              src={campaignDetails.login_page_image ?? '/hero.png'}
+              alt="Login image"
               width={415}
               height={315}
               priority
+              className={
+                'w-[415px] max-w-[100vw] md:w-[700px] lg:w-[920px] md:max-w-[100%] hidden md:block'
+              }
+            />
+            <Image
+              src={
+                campaignDetails.login_page_mobile_image ??
+                campaignDetails.login_page_image ??
+                '/hero.png'
+              }
+              alt="Login image"
+              width={415}
+              height={315}
+              priority
+              className={
+                'w-[415px] max-w-[100vw] md:w-[700px] lg:w-[920px] md:max-w-[100%] block md:hidden'
+              }
             />
           </div>
         </div>
       </div>
       <div className="sm:h-screen flex justify-center sm:items-center flex-1">
         <div className="flex sm:items-center w-[90%] xl:w-[80%] max-w-[375px] sm:max-w-[343px] pt-4 pb-10 sm:py-0">
-          <FormContainer campaignDetails={campaignDetails} />
+          <FormContainer
+            campaignCode={params.campaign_code}
+            campaignDetails={campaignDetails}
+            isIOS={isIOS}
+          />
         </div>
       </div>
     </div>

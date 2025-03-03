@@ -1,17 +1,20 @@
 import Description from '@/app/[locale]/(navbar)/[campaign_code]/products/[id]/_components/description';
 import Images from '@/app/[locale]/(navbar)/[campaign_code]/products/[id]/_components/images';
 import { getCurrentLocale } from '@/locales/server';
-import { getProductDetails } from '@/services/api';
+import { fetchShareItems } from '@/services/api';
+import { isProductOutOfStock } from '@/utils/product';
 
 export default async function Product({
   params,
+  searchParams,
 }: {
-  params: { campaign_code: string; id: number };
+  params: { campaign_code: string; id: number; share: string };
+  searchParams?: { [key: string]: string };
 }) {
   const locale = getCurrentLocale();
-  const product = await getProductDetails(
+  const product = await fetchShareItems(
     params.campaign_code,
-    params.id,
+    searchParams?.share ?? '',
     locale,
   );
 
@@ -20,20 +23,21 @@ export default async function Product({
       <div className="max-w-full flex flex-col sm:flex-row gap-3 sm:gap-[4.2rem]">
         <div className="sm:w-1/2">
           <Images
-            images={product?.images}
-            brandLogo={product?.brand?.logo_image}
+            images={product?.products[0]?.images}
+            brandLogo={product?.products[0]?.brand?.logo_image}
+            isOutOfStock={isProductOutOfStock(product)}
           />
         </div>
         <div className="flex justify-center md:items-start sm:w-1/2">
           <div className="w-full">
-            <h2 className="font-bold text-xl">{product.name}</h2>
+            <h2 className="font-bold text-xl">{product?.products[0]?.name}</h2>
             <p className="text-sm text-primary-100 mt-4">
-              {product.description}
+              {product?.products[0]?.description}
             </p>
           </div>
         </div>
       </div>
-      <Description product={product} />
+      <Description product={product?.products[0]} />
     </div>
   );
 }
