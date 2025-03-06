@@ -1,3 +1,5 @@
+<img src="https://github.com/user-attachments/assets/bca993c1-5161-44af-94bf-1bc4b17ed782" />
+
 # np-frontend
 
 This is a monorepo containing the different frontend projects of the Nicklas+ platform.
