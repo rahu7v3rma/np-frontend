@@ -68,7 +68,7 @@ export default function ProductsPage({
         )
       )}
       <div className="block flex-col justify-between items-center min-h-screen overflow-clip">
-        <div className="home-slider w-full mt-[70px] sm:mt-0 mb-4 relative">
+        <div className="home-slider w-full my-4 relative">
           <Banner />
         </div>
         <div className="w-full md:w-[664px] lg:w-[960px] xl:w-[1216px] 2xl:w-[1440px] mx-auto px-0">

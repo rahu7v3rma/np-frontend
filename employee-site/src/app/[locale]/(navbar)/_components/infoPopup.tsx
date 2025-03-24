@@ -38,7 +38,7 @@ const InfoPopup: FunctionComponent<Props> = ({
       {popup && (
         <div
           ref={popupRef}
-          className="absolute z-50 w-[270px] bg-white rounded-xl shadow-popup px-4 py-1"
+          className="absolute z-50 w-[270psx] bg-white rounded-xl shadow-popup px-4 py-1"
           style={{
             bottom: '82%',
             left: currentLocale === 'en' ? 'auto' : '-15px',

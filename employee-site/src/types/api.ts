@@ -30,4 +30,5 @@ export enum LoginMethods {
   email = 'e',
   phone = 'p',
   authId = 'a',
+  voucherCode = 'c',
 }

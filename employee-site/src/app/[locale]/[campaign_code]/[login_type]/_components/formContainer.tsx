@@ -75,6 +75,7 @@ const FormContainer: FunctionComponent<Props> = ({
     return (
       <LoginForm
         organizationName={campaignDetails.organization_name}
+        campaignType={campaignDetails?.campaign_type}
         onLoginSuccess={onLoginSuccess}
       />
     );

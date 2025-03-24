@@ -114,6 +114,12 @@ export default function Page() {
 
   useEffect(() => {
     const totalGiftPrice = cart.reduce((total, product) => {
+      if (
+        campaignDetails?.campaign_type === 'quick_offer_code' &&
+        product.product.product_kind === 'MONEY'
+      ) {
+        return total;
+      }
       return total + product.product.calculated_price * product.quantity;
     }, 0);
     setGiftPrice(totalGiftPrice);
@@ -161,7 +167,9 @@ export default function Page() {
             product.variations,
           ));
       }
-    } catch {}
+    } catch {
+      fetchCartItems && fetchCartItems();
+    }
   };
 
   const calculateTotalPrice = (price: number, quantity: number) => {
@@ -287,19 +295,15 @@ export default function Page() {
           </div>
         );
       case 'totalPrice':
-        return campaignType === 'quick_offer_code' ? (
-          <MultiSelectPrice
-            price={calculateTotalPrice(
-              row.product.calculated_price,
-              row.quantity,
-            ).toFixed(1)}
-          />
+        return campaignType === 'quick_offer_code' &&
+          row.product.product_kind === 'MONEY' ? (
+          '-'
         ) : (
           <MultiSelectPrice
             price={calculateTotalPrice(
               row.product.calculated_price,
               row.quantity,
-            )}
+            ).toFixed(1)}
           />
         );
       case 'discount':
@@ -391,7 +395,11 @@ export default function Page() {
                           className="text-[#868788]"
                           key={column.key}
                         >
-                          {column.label}
+                          <div
+                            className={`${column?.label === 'Quantity' ? 'flex justify-center items-center' : ''}`}
+                          >
+                            {column.label}
+                          </div>
                         </TableColumn>
                       )}
                     </TableHeader>
@@ -404,7 +412,11 @@ export default function Page() {
                         <TableRow key={item.id}>
                           {(columnKey) => (
                             <TableCell className="border-b border-[#919EAB33] border-dashed pt-[10px] pb-[10px]">
-                              {renderCell(item, columnKey as string)}
+                              <div
+                                className={`${columnKey === 'quantity' ? 'flex justify-center items-center' : ''}`}
+                              >
+                                {renderCell(item, columnKey as string)}
+                              </div>
                             </TableCell>
                           )}
                         </TableRow>

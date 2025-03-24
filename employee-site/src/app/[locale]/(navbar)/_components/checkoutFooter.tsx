@@ -106,7 +106,7 @@ export default function CheckoutComplete({
               dir={locale === 'he' ? 'rtl' : 'ltr'}
               className="flex flex-row justify-around gap-2 md:gap-4"
             >
-              {campaignType !== 'wallet' && (
+              {campaignDetails?.campaign_type !== 'WALLET' && (
                 <Button
                   variant="bordered"
                   size="lg"

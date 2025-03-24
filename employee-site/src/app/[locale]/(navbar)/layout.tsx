@@ -23,7 +23,7 @@ const NavbarLayout = ({
         <ProductWrapper>
           <div className="flex flex-col h-full">
             {noNavBar ? null : <NavBar />}
-            <main className="py-4 md:py-10 flex-1">{children}</main>
+            <main className="mt-20 flex-1">{children}</main>
             <Footer />
           </div>
         </ProductWrapper>

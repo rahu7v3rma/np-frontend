@@ -51,6 +51,7 @@ type Props = {
   setProductImages: Dispatch<SetStateAction<ProductImage[]>>;
   productKind?: ProductKind;
   voucherValue?: number;
+  discountRate?: number;
   productLink?: string;
 };
 
@@ -71,6 +72,7 @@ const Actions: FunctionComponent<Props> = ({
   setProductImages,
   productKind,
   voucherValue,
+  discountRate,
   productLink,
 }: Props) => {
   const t = useI18n();
@@ -245,22 +247,34 @@ const Actions: FunctionComponent<Props> = ({
               </div>
             )
           : !!calculatedPrice && (
-              <div className="text-[#868788] text-base flex gap-1 items-center">
-                {productKind === 'MONEY' && <p>{t('cart.price')}</p>}
-                <MultiSelectPrice price={calculatedPrice} point />
-              </div>
+              <>
+                <div className="text-[#868788] text-base flex gap-1 items-center">
+                  {campaignType === 'quick_offer_code' &&
+                  productKind === 'MONEY' ? null : (
+                    <>
+                      <p>{t('cart.price')}</p>
+                      <MultiSelectPrice price={calculatedPrice} point />
+                    </>
+                  )}
+                </div>
+              </>
             )}
         {productKind === 'MONEY' ? (
           <div className="border-[1px] border-[#2B324C] rounded-[8px] text-[13px] text-[#2B324C] font-[500] leading-[18px] h-[24px] flex items-center px-2">
+            {campaignType !== 'quick_offer_code' && t('products.money_value')}{' '}
             {campaignType === 'quick_offer_code'
-              ? t('cart.discount')
-              : t('products.money_value')}{' '}
-            {voucherValue +
-              (campaignDetails?.displayed_currency !== 'POINT'
-                ? campaignType === 'quick_offer_code'
-                  ? t('moneySymbol')
-                  : t('currencySymbol')
-                : '')}
+              ? discountRate +
+                (campaignDetails?.displayed_currency !== 'POINT'
+                  ? campaignType === 'quick_offer_code'
+                    ? t('moneySymbol') + ' ' + t('cart.discount')
+                    : t('currencySymbol')
+                  : '')
+              : voucherValue +
+                (campaignDetails?.displayed_currency !== 'POINT'
+                  ? campaignType === 'quick_offer_code'
+                    ? t('moneySymbol')
+                    : t('currencySymbol')
+                  : '')}
           </div>
         ) : (
           !!exchangeValue && (

@@ -140,7 +140,11 @@ const NavBar = ({ isAuthenticated = true }) => {
           <div className={`flex h-20 items-center justify-between`}>
             <div className="flex">
               <Link href="/" legacyBehavior>
-                <a>
+                <a
+                  onClick={() => {
+                    sessionStorage.removeItem('products_screen_scrollPosition');
+                  }}
+                >
                   <Image
                     className="relative object-contain w-auto h-full max-h-10 hidden md:block"
                     src={
@@ -155,7 +159,11 @@ const NavBar = ({ isAuthenticated = true }) => {
               </Link>
 
               <Link href="/" legacyBehavior>
-                <a>
+                <a
+                  onClick={() => {
+                    sessionStorage.removeItem('products_screen_scrollPosition');
+                  }}
+                >
                   <Image
                     className="relative md:object-contain w-auto h-full md:max-h-7 block md:hidden"
                     src={

@@ -2,6 +2,8 @@ export default {
   products: {
     additional: 'EXTRA',
     value: 'Value',
+    cartValue: 'Value',
+    Discount: 'Discount',
     money_value: 'Value',
     out_of_stock: 'OUT OF STOCK',
     name: 'Product name - Lorem ipsum dolor sit amet, consectetur',
@@ -27,6 +29,7 @@ export default {
   login: {
     form: {
       title: 'Log in to the gifts website',
+      titleVoucherMode: 'Insert Your Voucher Code',
       phoneModeDescription: 'Enter your phone number, get a code and log in.',
       phoneModePlaceholder: 'Phone Number',
       emailModeDescription: 'Enter your work email, get a code and log in.',
@@ -34,6 +37,7 @@ export default {
       idModeDescription:
         "Enter your ID / employee number according to the company's instructions and log in.",
       idModePlaceholder: 'Your ID',
+      voucherModePlaceholder: 'Voucher Code',
       buttonText: 'Login',
       ValidEmail: 'Please Enter Valid Email',
       OtpSuccess: 'OTP was sent successfully',
@@ -41,6 +45,8 @@ export default {
       SomethingWentWrong: 'Something went wrong',
       wrongCredentials:
         'Invalid email or password. Please check your credentials and try again',
+      wrongVoucherCode:
+        'Your voucher code is incorrect, please try again or contact customer service.',
     },
     otpForm: {
       enterCodePhone: 'Enter the code you received in SMS',
@@ -161,6 +167,8 @@ export default {
     zipCodeErrMsg: 'Please enter a zip code',
     notification: 'This product will be sent directly to the employee’s home.',
     voucherPhoneNumber: 'Add phone number for voucher',
+    voucherPhoneDescription:
+      'To receive the voucher via SMS, please enter your phone number (receiving the voucher is not immediate)',
   },
   order: {
     scancode: 'Scan to the order page',

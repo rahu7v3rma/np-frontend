@@ -112,6 +112,7 @@ export default function Page() {
             setProductImages={setProductImages}
             productKind={product?.product_kind}
             voucherValue={product?.voucher_value}
+            discountRate={product?.discount_rate}
             productLink={product?.link}
           />
         </div>

@@ -63,7 +63,7 @@ export default function LanguageSwitcher() {
                 alt="Israel Flag"
                 width={28}
                 height={20}
-                className={`${currentLocale === 'en' ? 'mr-2' : 'ml-2'}`}
+                className={`${currentLocale === 'he' ? 'mr-2' : 'ml-2'}`}
               />
               <span>עברית</span>
             </div>

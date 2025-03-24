@@ -229,9 +229,7 @@ export default function Page() {
 
         // refresh cart to account for it clearing
         fetchCartItems && fetchCartItems();
-        campaignDetails?.campaign_type === 'WALLET'
-          ? router.replace(`/${campaign_code}`)
-          : router.replace(`/${campaign_code}/order`);
+        router.replace(`/${campaign_code}/order`);
       } catch (err: any) {
         if (err.status === 402) {
           setPaymentCode(err.data.data.payment_code);
@@ -308,6 +306,7 @@ export default function Page() {
     countryCode,
     forceHomeDelivery,
     postOrder,
+    showPhoneInput,
   ]);
 
   const handlePaid = useCallback(() => {
@@ -522,11 +521,13 @@ export default function Page() {
               {campaignDetails.delivery_location === 'ToHome' ||
               forceHomeDelivery ? (
                 <div className="border border-[#919EAB33] rounded-2xl mb-6 border-slate-200 shadow-md shadow-grey-400">
-                  <div className="px-6 py-4 border-b-[1px]">
-                    <h2 className="text-primary leading-7 font-bold text-lg">
-                      {t('checkout.delivery')}
-                    </h2>
-                  </div>
+                  {campaignDetails.campaign_type !== 'WALLET' && (
+                    <div className="px-6 py-4 border-b-[1px]">
+                      <h2 className="text-primary leading-7 font-bold text-lg">
+                        {t('checkout.delivery')}
+                      </h2>
+                    </div>
+                  )}
                   <div className="px-6 py-4">
                     <>
                       {!showPhoneInput ? (
@@ -867,11 +868,14 @@ export default function Page() {
                         </>
                       ) : (
                         <>
-                          <h3 className="text-primary font-semibold leading-6 text-base pb-4">
-                            {t('checkout.homeDelivery')}
-                          </h3>
+                          {campaignDetails.campaign_type !== 'WALLET' && (
+                            <h3 className="text-primary font-semibold leading-6 text-base pb-4">
+                              {t('checkout.homeDelivery')}
+                            </h3>
+                          )}
+
                           <h3 className="text-primary leading-6 font-semibold text-base pb-4">
-                            {t('checkout.voucherPhoneNumber')}
+                            {t('checkout.voucherPhoneDescription')}
                           </h3>
                           <Input
                             variant="bordered"
@@ -902,24 +906,33 @@ export default function Page() {
                 </div>
               ) : (
                 <div className="border border-[#919EAB33]  rounded-2xl w-full md:max-w-3xl mb-6 border-slate-200 shadow-md shadow-grey-400">
-                  <div className="px-6 py-4 border-b-[1px]">
-                    <h2 className="text-primary leading-7 font-bold text-lg">
-                      {t('checkout.delivery')}
-                    </h2>
-                  </div>
-                  <div className="px-6 py-4">
-                    <h3 className="text-primary leading-6 font-semibold text-[18px] pb-4">
-                      {t('checkout.officeDelivery')}
-                    </h3>
-                    <div className="flex flex-col md:flex-row gap-4 mb-0 md:mb-4">
-                      <div className="flex flex-col md:flex-row flex-1 gap-4 text-sm text-[#868788] font-normal leading-[22px]">
-                        {campaignDetails?.office_delivery_address}
-                      </div>
+                  {campaignDetails.campaign_type !== 'WALLET' && (
+                    <div className="px-6 py-4 border-b-[1px]">
+                      {campaignDetails.campaign_type !== 'WALLET' && (
+                        <h2 className="text-primary leading-7 font-bold text-lg">
+                          {t('checkout.delivery')}
+                        </h2>
+                      )}
                     </div>
+                  )}
+                  <div className="px-6 py-4">
+                    {campaignDetails.campaign_type !== 'WALLET' && (
+                      <>
+                        <h3 className="text-primary leading-6 font-semibold text-[18px] pb-4">
+                          {t('checkout.officeDelivery')}
+                        </h3>
+
+                        <div className="flex flex-col md:flex-row gap-4 mb-0 md:mb-4">
+                          <div className="flex flex-col md:flex-row flex-1 gap-4 text-sm text-[#868788] font-normal leading-[22px]">
+                            {campaignDetails.office_delivery_address}
+                          </div>
+                        </div>
+                      </>
+                    )}
                     {showPhoneInput && (
                       <>
                         <h3 className="text-primary leading-6 font-semibold text-base pb-4">
-                          {t('checkout.voucherPhoneNumber')}
+                          {t('checkout.voucherPhoneDescription')}
                         </h3>
                         <Input
                           variant="bordered"
@@ -962,6 +975,7 @@ export default function Page() {
               router.replace(`/${campaign_code}`);
             }}
             onSubmit={handleCheckoutSubmit}
+            productLinks={false}
           />
         ) : (
           <div>
@@ -974,6 +988,7 @@ export default function Page() {
                   : !!campaignDetails?.employee_order_reference || loading
               }
               onSubmit={handleCheckoutSubmit}
+              productLinks={false}
             />
           </div>
         )}

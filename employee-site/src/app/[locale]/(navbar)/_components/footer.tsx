@@ -99,11 +99,11 @@ const Footer: FunctionComponent<Props> = ({}: Props) => {
           <ul
             className={`pt-6 text-center ${checkF} md:text-start text-[#363839]`}
           >
-            <li className="pb-4 hover:text-blue-500 hover:underline transition-colors duration-200">
-              <a href="">{t('footer.termsAndCondition')}</a>
+            <li className="pb-4">
+              <span className="">{t('footer.termsAndCondition')}</span>
             </li>
-            <li className="hover:text-blue-500 hover:underline transition-colors duration-200">
-              <a href="">{t('footer.privacyPolicy')}</a>
+            <li className="">
+              <span className="">{t('footer.privacyPolicy')}</span>
             </li>
           </ul>
         </div>

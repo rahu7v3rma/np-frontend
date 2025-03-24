@@ -180,7 +180,7 @@ export default function ProductCard({
                   <span
                     className={`${locale === 'he' ? 'font-normal text-xs-1' : ' font-medium text-xs-2 md:text-xs-1'} px-1 hidden md:block flex justify-center items-center rounded-lg border border-black leading-5-1`}
                   >
-                    {`${campaignType === 'quick_offer_code' ? t('cart.discount') : t('products.money_value')} ${Math.floor(product.voucher_value)}${
+                    {`${campaignType === 'quick_offer_code' ? t('cart.discount') : t('products.money_value')} ${campaignType === 'quick_offer_code' ? Math.floor(product.discount_rate) : Math.floor(product.voucher_value)}${
                       campaignDetails?.displayed_currency !== 'POINT'
                         ? campaignType === 'quick_offer_code'
                           ? t('moneySymbol')
@@ -230,14 +230,17 @@ export default function ProductCard({
               {(isQuickOfferCampaign(campaignType ?? '') ||
                 campaignDetails?.product_selection_mode === 'MULTIPLE') && (
                 <>
-                  {!!product?.calculated_price && (
-                    <span className="!text-[15px] font-semibold leading-6 flex justify-center items-center gap-0.5">
-                      <MultiSelectPrice
-                        price={product.calculated_price}
-                        point
-                      />
-                    </span>
-                  )}
+                  {campaignType === 'quick_offer_code' &&
+                  product.product_kind === 'MONEY'
+                    ? null
+                    : !!product?.calculated_price && (
+                        <span className="!text-[15px] font-semibold leading-6 flex justify-center items-center gap-0.5">
+                          <MultiSelectPrice
+                            price={product.calculated_price}
+                            point
+                          />
+                        </span>
+                      )}
                 </>
               )}
             </div>

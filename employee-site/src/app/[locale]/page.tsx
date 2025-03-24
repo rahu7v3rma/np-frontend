@@ -21,6 +21,11 @@ export default async function App() {
             <span className="font-bold">/your_campaign_code/a</span> in the
             current url
           </li>
+          <li className="my-2">
+            For login with voucher code{' '}
+            <span className="font-bold">/your_campaign_code/c</span> in the
+            current url
+          </li>
         </ul>
       </div>
     </div>

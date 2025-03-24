@@ -60,7 +60,7 @@ export function middleware(request: NextRequest) {
   // Redirect to root page if user is not authenticated
   const publicRoutesRegex = [
     // Login route
-    /\/*\/[epai]$/,
+    /\/*\/[epaic]$/,
     // Product route
     /\/.*\/product\/.*$/,
     // Cart-Details route

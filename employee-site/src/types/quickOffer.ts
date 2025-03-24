@@ -42,5 +42,6 @@ export interface QuickOfferDetailsType {
   selected_products: string[];
   organization_name: string;
   organization_logo_image: string;
+  campaign_type?: string;
   is_active: boolean;
 }

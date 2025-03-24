@@ -60,7 +60,7 @@ export const CartContext = createContext<ContextType>({
 export function CartWrapper({ children }: { children: ReactNode }) {
   const { campaign_code } = useParams<{ campaign_code: string }>();
   const locale = useCurrentLocale();
-  const { campaignType } = useContext(CampaignContext);
+  const { campaignType, campaignDetails } = useContext(CampaignContext);
 
   const [cartProducts, setCartProducts] = useState<ProductCart[]>([]);
   const [isShowCart, setIsShowCart] = useState<boolean>(false);
@@ -131,11 +131,15 @@ export function CartWrapper({ children }: { children: ReactNode }) {
           return false;
         })?.quantity ?? 0;
       // To consider existing quanity for the product + new quantity
+      const updatedQuantity =
+        campaignDetails?.product_selection_mode === 'SINGLE'
+          ? 1
+          : existingQuantity + quantity;
       return addProductToCart(
         campaign_code,
         locale,
         productId,
-        existingQuantity + quantity,
+        updatedQuantity,
         variations,
         campaignType ?? '',
       ).then(() => fetchCartItems(true));

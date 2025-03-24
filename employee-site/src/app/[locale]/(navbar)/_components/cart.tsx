@@ -124,9 +124,9 @@ const Cart: FunctionComponent<Props> = ({ onClose }) => {
           </h4>
         </div>
       ) : (
-        <div className="bg-white">
+        <div className="bg-white max-h-[30lvh]">
           <div
-            className="p-4 gap-4 ltr:mr-1 rtl:ml-1 md:ltr:mr-0 md:rtl:ml-0 flex flex-col max-h-[335px] overflow-y-scroll 
+            className="p-4 gap-4 ltr:mr-1 rtl:ml-1 md:ltr:mr-0 md:rtl:ml-0 flex flex-col max-h-[30lvh] overflow-y-scroll
           min-[768px]:[&::-webkit-scrollbar]:w-[6px] min-[768px]:[&::-webkit-scrollbar-thumb]:bg-[#868788] min-[768px]:[&::-webkit-scrollbar-thumb]:rounded-xl
           max-[768px]:[&::-webkit-scrollbar]:w-[6px] max-[768px]:[&::-webkit-scrollbar-thumb]:bg-[#868788] max-[768px]:[&::-webkit-scrollbar-thumb]:rounded-xl"
           >

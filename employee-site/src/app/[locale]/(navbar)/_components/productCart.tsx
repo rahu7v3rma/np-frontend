@@ -43,8 +43,8 @@ function ProductCartCard({
   const router = useRouter();
   const currentLocale = useCurrentLocale();
 
-  const { campaignDetails } = useContext(CampaignContext);
-  const { updateCartItemQuantity } = useContext(CartContext);
+  const { campaignDetails, campaignType } = useContext(CampaignContext);
+  const { updateCartItemQuantity, fetchCartItems } = useContext(CartContext);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>(
@@ -73,7 +73,9 @@ function ProductCartCard({
           newQuantity,
           cartItem.variations,
         ));
-    } catch {}
+    } catch {
+      fetchCartItems && fetchCartItems();
+    }
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,9 +125,12 @@ function ProductCartCard({
       <div className="h-full flex-1 flex flex-col justify-between gap-[6px]">
         <div className="flex gap-2  items-center">
           <div className="">
-            <label className="font-sans font-semibold text-sm leading-[22px]">
-              <MultiSelectPrice price={cartItem?.product?.calculated_price} />
-            </label>
+            {campaignType === 'quick_offer_code' &&
+            cartItem.product.product_kind === 'MONEY' ? null : (
+              <label className="font-sans font-semibold text-sm leading-[22px]">
+                <MultiSelectPrice price={cartItem?.product?.calculated_price} />
+              </label>
+            )}
           </div>
           <div
             className={`hidden md:block ${currentLocale === 'he' ? 'max-w-[95px]' : 'max-w-[110px]'}`}
@@ -136,15 +141,15 @@ function ProductCartCard({
                 title={`${t('products.value')} 
                   ${campaignDetails?.displayed_currency !== 'POINT' ? t('currencySymbol') : ''}${Math.floor(cartItem.product.voucher_value)}`}
               >
-                {`${t('products.value')} ${t('currencySymbol')}${Math.floor(cartItem.product.voucher_value)}`
+                {`${t('products.cartValue')} ${t('currencySymbol')}${Math.floor(cartItem.product.voucher_value)}`
                   .length > 13
-                  ? `${t('products.value')}
+                  ? `${t('products.cartValue')}
                       ${campaignDetails?.displayed_currency !== 'POINT' ? t('currencySymbol') : ''}
                     ${Math.floor(cartItem.product.voucher_value)}`.slice(
                       0,
                       13,
                     ) + '...'
-                  : `${t('products.value')}
+                  : `${t('products.cartValue')}
                      ${campaignDetails?.displayed_currency !== 'POINT' ? t('currencySymbol') : ''}${Math.floor(cartItem.product.voucher_value)}`}
               </div>
             )}
@@ -154,16 +159,16 @@ function ProductCartCard({
           {!!cartItem?.product?.voucher_value && (
             <div
               className="border-[1px] cursor-pointer border-[#2B324C] rounded-[8px] text-[13px] text-[#2B324C] font-[500] leading-[18px] h-[24px] flex items-center px-2 overflow-hidden text-ellipsis whitespace-nowrap"
-              title={`${t('products.value')} 
+              title={`${t('products.cartValue')} 
               ${campaignDetails?.displayed_currency !== 'POINT' ? t('currencySymbol') : '' + cartItem?.product?.voucher_value}`}
             >
-              {`${t('products.value')} ${t('currencySymbol')}${Math.floor(cartItem.product.voucher_value)}`
+              {`${t('products.cartValue')} ${t('currencySymbol')}${Math.floor(cartItem.product.voucher_value)}`
                 .length > 13
-                ? `${t('products.value')} ${t('currencySymbol')}${Math.floor(cartItem.product.voucher_value)}`.slice(
+                ? `${t('products.cartValue')} ${t('currencySymbol')}${Math.floor(cartItem.product.voucher_value)}`.slice(
                     0,
                     13,
                   ) + '...'
-                : `${t('products.value')} 
+                : `${t('products.cartValue')} 
                   ${campaignDetails?.displayed_currency !== 'POINT' ? t('currencySymbol') : ''}${Math.floor(cartItem.product.voucher_value)}`}
             </div>
           )}
@@ -181,7 +186,7 @@ function ProductCartCard({
         {cartItem?.product?.product_kind == 'MONEY' && (
           <span className=" bg-discount-light border-1 border-discount my-[2px] rounded-lg font-medium text-xs-1 leading-[18px] text-discount w-fit flex items-center gap-[2px] py-[3px] px-2">
             <DiscountIcon />
-            {`Discount ${cartItem?.product?.discount_rate}%`}
+            {`${t('products.Discount')} ${cartItem?.product?.discount_rate}%`}
           </span>
         )}
         {cartItem?.product?.product_kind != 'MONEY' && (

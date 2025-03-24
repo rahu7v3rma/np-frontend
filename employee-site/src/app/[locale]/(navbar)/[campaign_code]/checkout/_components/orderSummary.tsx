@@ -19,6 +19,7 @@ interface Props {
   displayProducts?: boolean;
   submitDisabled?: boolean;
   onSubmit: () => void;
+  productLinks?: boolean;
 }
 
 export default function OrderSummary({
@@ -27,6 +28,7 @@ export default function OrderSummary({
   displayProducts = true,
   submitDisabled = false,
   onSubmit,
+  productLinks = true,
 }: Props) {
   const t = useI18n();
   const currentLocale = useCurrentLocale();
@@ -78,12 +80,16 @@ export default function OrderSummary({
                         alt={'Product Image'}
                         width={96}
                         height={96}
-                        onClick={() => {
-                          router.push(
-                            `/${campaignDetails?.code}/products/${product.id}`,
-                          );
-                        }}
-                        className="cursor-pointer"
+                        onClick={
+                          productLinks
+                            ? () => {
+                                router.push(
+                                  `/${campaignDetails?.code}/products/${product.id}`,
+                                );
+                              }
+                            : undefined
+                        }
+                        className={productLinks ? 'cursor-pointer' : ''}
                       />
                     </div>
                     <div className="flex-1">
@@ -91,12 +97,16 @@ export default function OrderSummary({
                         <MultiSelectPrice price={product?.calculated_price} />
                       </span>
                       <p
-                        onClick={() => {
-                          router.push(
-                            `/${campaignDetails?.code}/products/${product.id}`,
-                          );
-                        }}
-                        className="
+                        onClick={
+                          productLinks
+                            ? () => {
+                                router.push(
+                                  `/${campaignDetails?.code}/products/${product.id}`,
+                                );
+                              }
+                            : undefined
+                        }
+                        className={`
                           flex 
                           text-[#868788] 
                           font-normal 
@@ -104,7 +114,7 @@ export default function OrderSummary({
                           leading-[22px] 
                           ltr:mr-4
                           rtl:ml-4
-                          cursor-pointer"
+                          ${productLinks ? 'cursor-pointer' : ''}`}
                       >
                         {product?.name}
                       </p>
@@ -196,7 +206,7 @@ export default function OrderSummary({
         <Button
           color="primary"
           size="lg"
-          className={`flex-1 ${displayProducts && budget > giftPrice ? 'bg-button-background-1 text-button-text-color-1' : ''}`}
+          className={`flex-1 ${campaignDetails?.campaign_type !== 'WALLET' ? displayProducts && budget > giftPrice && 'bg-button-background-1 text-button-text-color-1' : ''}`}
           isDisabled={submitDisabled}
           onClick={onSubmit}
         >
@@ -207,20 +217,22 @@ export default function OrderSummary({
             : t('button.continue')}
         </Button>
       </div>
-      {displayProducts && budget > giftPrice && (
-        <div className="flex mt-6 pt-2 pl-3 gap-1">
-          <Image
-            src="/alert.svg"
-            height={16}
-            width={16}
-            alt="alert image"
-            className="mb-auto"
-          />
-          <label className="ltr:font-sans font-normal text-xs leading-[18px] text-alert">
-            {t('checkout.budgetAlert')}
-          </label>
-        </div>
-      )}
+      {campaignDetails?.campaign_type !== 'WALLET' &&
+        displayProducts &&
+        budget > giftPrice && (
+          <div className="flex mt-6 pt-2 pl-3 gap-1">
+            <Image
+              src="/alert.svg"
+              height={16}
+              width={16}
+              alt="alert image"
+              className="mb-auto"
+            />
+            <label className="ltr:font-sans font-normal text-xs leading-[18px] text-alert">
+              {t('checkout.budgetAlert')}
+            </label>
+          </div>
+        )}
     </div>
   );
 }

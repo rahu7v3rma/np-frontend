@@ -128,13 +128,18 @@ const CategoriesBar: FunctionComponent<Props> = ({
     getCampaignCategories(campaignCode, currentLocale, campaignType ?? '')
       .then((data: { categories: CategoryType[] }) => {
         setCategories([
+          ...data.categories
+            .filter((c) => c.order < 0)
+            .sort((a, b) => b.order - a.order),
           {
             id: 0,
             name: 'All',
             icon_image: '/all-icon.svg',
             order: Infinity,
           },
-          ...data.categories.sort((a, b) => b.order - a.order),
+          ...data.categories
+            .filter((c) => c.order >= 0)
+            .sort((a, b) => b.order - a.order),
         ]);
         setErrorCategories(false);
         setLoading(false);

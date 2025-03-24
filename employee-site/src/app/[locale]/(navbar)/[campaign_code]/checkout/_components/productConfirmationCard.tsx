@@ -16,6 +16,7 @@ type ProductConfirmation = {
   submitDisabled: boolean;
   onCancel: () => void;
   onSubmit: () => void;
+  productLinks?: boolean;
 };
 
 export default function ProductConfirmationCard({
@@ -24,6 +25,7 @@ export default function ProductConfirmationCard({
   selectedVariations,
   onCancel,
   onSubmit,
+  productLinks = true,
 }: ProductConfirmation) {
   const [isOpen, setIsopen] = useState<boolean>(false);
   const t = useI18n();
@@ -58,27 +60,35 @@ export default function ProductConfirmationCard({
                       {product?.images?.length > 0 && (
                         <Image
                           src={product.images[0].image}
-                          className="cursor-pointer"
+                          className={productLinks ? 'cursor-pointer' : ''}
                           alt={'Product Image'}
                           width={96}
                           height={96}
-                          onClick={() => {
-                            router.push(
-                              `/${campaignDetails?.code}/products/${product.id}`,
-                            );
-                          }}
+                          onClick={
+                            productLinks
+                              ? () => {
+                                  router.push(
+                                    `/${campaignDetails?.code}/products/${product.id}`,
+                                  );
+                                }
+                              : undefined
+                          }
                         />
                       )}
                     </div>
                     <div className="flex-1">
                       <span className="flex font-semibold text-sm mt-1 leading-[22px]"></span>
                       <p
-                        onClick={() => {
-                          router.push(
-                            `/${campaignDetails?.code}/products/${product.id}`,
-                          );
-                        }}
-                        className="
+                        onClick={
+                          productLinks
+                            ? () => {
+                                router.push(
+                                  `/${campaignDetails?.code}/products/${product.id}`,
+                                );
+                              }
+                            : undefined
+                        }
+                        className={`
                           flex 
                           text-[#868788] 
                           font-normal 
@@ -86,7 +96,7 @@ export default function ProductConfirmationCard({
                           leading-[22px] 
                           ltr:mr-4
                           rtl:ml-4
-                          cursor-pointer"
+                          ${productLinks ? 'cursor-pointer' : ''}`}
                       >
                         {product?.name}
                       </p>

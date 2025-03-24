@@ -19,11 +19,13 @@ import { LoginMethods, LoginPayload } from '@/types/api';
 
 type Props = {
   organizationName: string;
+  campaignType?: string;
   onLoginSuccess: (loginPayload: LoginPayload) => void;
 };
 
 const LoginForm: FunctionComponent<Props> = ({
   organizationName,
+  campaignType,
   onLoginSuccess,
 }: Props) => {
   const t = useI18n();
@@ -49,6 +51,9 @@ const LoginForm: FunctionComponent<Props> = ({
   } else if (login_type === LoginMethods.authId) {
     modeText = t('login.form.idModeDescription');
     inputPlaceholder = t('login.form.idModePlaceholder');
+  } else if (login_type === LoginMethods.voucherCode) {
+    modeText = '';
+    inputPlaceholder = t('login.form.voucherModePlaceholder');
   }
 
   const validateForm = useCallback(() => {
@@ -85,6 +90,8 @@ const LoginForm: FunctionComponent<Props> = ({
       loginPayload = { email: fieldValue };
     } else if (login_type === LoginMethods.phone) {
       loginPayload = { phone_number: fieldValue };
+    } else if (login_type === LoginMethods.voucherCode) {
+      loginPayload = { auth_id: fieldValue };
     } else {
       loginPayload = { auth_id: fieldValue };
     }
@@ -110,7 +117,11 @@ const LoginForm: FunctionComponent<Props> = ({
       ) {
         // 'request_invalid' error can be raised if the phone number is bad
         // since we validate it in the backend
-        setErrorMessage(t('login.form.wrongCredentials'));
+        setErrorMessage(
+          login_type === LoginMethods.voucherCode
+            ? t('login.form.wrongVoucherCode')
+            : t('login.form.wrongCredentials'),
+        );
       } else {
         reportError(err);
       }
@@ -148,13 +159,17 @@ const LoginForm: FunctionComponent<Props> = ({
         <span
           className={'text-[24px] leading-[36px] font-[700] text-[#363839]'}
         >
-          {t('login.form.title')}
+          {login_type === LoginMethods.voucherCode
+            ? t('login.form.titleVoucherMode')
+            : t('login.form.title')}
         </span>
-        <span
-          className={'text-[24px] leading-[36px] font-[700] text-[#363839]'}
-        >
-          {organizationName}
-        </span>
+        {campaignType !== 'WALLET' && (
+          <span
+            className={'text-[24px] leading-[36px] font-[700] text-[#363839]'}
+          >
+            {organizationName}
+          </span>
+        )}
         <span
           className={'text-[14px] leading-[22px] font-[400] text-[#363839]'}
         >

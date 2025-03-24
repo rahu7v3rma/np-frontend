@@ -42,7 +42,7 @@ export default function CustomerServiceModal({
         footer:
           'border-t-[1px] border-[#919EAB] border-opacity-40 justify-start items-start flex-col',
       }}
-      dir="ltr"
+      dir={locale === 'he' ? 'rtl' : 'ltr'}
     >
       <ModalContent>
         {(onClose) => (
@@ -85,14 +85,14 @@ export default function CustomerServiceModal({
                     </li>
                   </ul>
                 </div>
-                <div className="mt-[24px]">
+                {/* <div className="mt-[24px]">
                   <div className="flex items-center gap-2">
                     <MdOutlineBackpack size="1.5rem" />
                     <span className="text-sm font-semibold text-[#363839]">
                       {t('customerServiceDialog.chooseVariationTitle')}
                     </span>
                   </div>
-                </div>
+                </div> */}
                 <div className="mt-[24px]">
                   <div className="flex items-center gap-2">
                     <MdOutlineChangeCircle size="1.5rem" />

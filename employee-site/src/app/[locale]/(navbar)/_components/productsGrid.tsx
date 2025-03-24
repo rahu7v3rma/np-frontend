@@ -49,11 +49,6 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
 
   const { products, hasMore, totalCount, inBudgetCount } = productsData;
 
-  const [allProducts, setAllProducts] = useState<Product[]>(products);
-  useEffect(() => {
-    setAllProducts(products);
-  } , [products]);
-
   const page = Number(searchParams?.get('p')) || 1;
   const categoryId = Number(searchParams?.get('c')) || 0;
   const searchText = searchParams?.get('q') || undefined;
@@ -64,7 +59,7 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
       : undefined;
 
   const isInitialRender = useRef(true);
-  const loading = useRef<boolean>(true);
+  const loading = useRef<boolean>(false);
 
   const gridEndRef = useRef<HTMLDivElement>(null);
 
@@ -228,6 +223,16 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
     [searchParams, router, pathName],
   );
 
+  const handleGridScrolledToEnd = useCallback(() => {
+    if (hasMore && !loading.current) {
+      loading.current = true;
+      const params = new URLSearchParams(searchParams.toString());
+
+      params.set('p', (page + 1).toString());
+
+      router.replace(`${pathName}?${params.toString()}`, { scroll: false });
+    }
+  }, [hasMore, loading, searchParams, page, router, pathName]);
   const addToCartHandler = useCallback(
     async (productId: number, variations?: Record<string, string>) => {
       try {
@@ -277,35 +282,13 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
     setShowFilterSheet((prevVal) => !prevVal);
   }, []);
 
-  const endObserver = useRef<IntersectionObserver | null>(null);
-  useEffect(() => {
-    endObserver.current?.disconnect();
-
-    endObserver.current = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        console.log('gridEndRef');
-        
-        if (hasMore && !loading.current) {
-          console.log('fetching next page');
-          loading.current = true;
-          const params = new URLSearchParams(searchParams.toString());
-    
-          params.set('p', (page + 1).toString());
-    
-          router.replace(`${pathName}?${params.toString()}`, { scroll: false });
-        }
-      }
-    });
-
-    if(gridEndRef.current) {
-      endObserver.current.observe(gridEndRef.current);
-    }
-    
-  }, [gridEndRef, hasMore, loading, page, router, searchParams, pathName]);
+  // "subscribe" to events of the component at the end of the products grid
+  // coming into the viewport so we can load the next products page if there is
+  // one
+  useViewportEntry(gridEndRef, handleGridScrolledToEnd);
 
   return (
     <div
-      id="products-grid"
       className={`transition-[padding] ${showFilterSheet ? 'lg:ps-[400px] xl:ps-[300px]' : 'ps-0'}`}
     >
       <div className="mb-10" id="category-bar">
@@ -345,7 +328,7 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
           );
         })}
       </div>
-      <div ref={gridEndRef} className="w-[1px] h-[1px] loading-ref" />
+      {!loading.current && <div ref={gridEndRef} className="w-[1px] h-[1px]" />}
       <FilterSheet
         isOpen={showFilterSheet}
         toggleShowFilter={toggleShowFilterHandler}
