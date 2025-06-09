@@ -63,6 +63,7 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
 
   const gridEndRef = useRef<HTMLDivElement>(null);
 
+  const [lastRow, setLastRow] = useState<HTMLDivElement | null>(null);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
   const cartTotalPrice = useMemo(
     () =>
@@ -224,7 +225,7 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
   );
 
   const handleGridScrolledToEnd = useCallback(() => {
-    if (hasMore && !loading.current) {
+    if (hasMore && !loading.current && products.length) {
       loading.current = true;
       const params = new URLSearchParams(searchParams.toString());
 
@@ -232,7 +233,7 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
 
       router.replace(`${pathName}?${params.toString()}`, { scroll: false });
     }
-  }, [hasMore, loading, searchParams, page, router, pathName]);
+  }, [hasMore, loading, searchParams, page, router, pathName, products]);
   const addToCartHandler = useCallback(
     async (productId: number, variations?: Record<string, string>) => {
       try {
@@ -285,7 +286,27 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
   // "subscribe" to events of the component at the end of the products grid
   // coming into the viewport so we can load the next products page if there is
   // one
-  useViewportEntry(gridEndRef, handleGridScrolledToEnd);
+  // useViewportEntry(gridEndRef, handleGridScrolledToEnd);
+
+  useEffect(() => {
+    if (!lastRow || loading.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !loading.current) {
+          loading.current = true;
+          const params = new URLSearchParams(searchParams.toString());
+          params.set('p', (page + 1).toString());
+          router.replace(`${pathName}?${params.toString()}`, { scroll: false });
+        }
+      },
+      {
+        rootMargin: '100%',
+        threshold: 0,
+      },
+    );
+    observer.observe(lastRow);
+    return () => observer.disconnect();
+  }, [lastRow, hasMore, loading, searchParams, page, router, pathName]);
 
   return (
     <div
@@ -312,10 +333,12 @@ const ProductsGrid: FunctionComponent<Props> = ({ campaignCode }: Props) => {
       <div
         className={`transition-[padding] grid grid-cols-2 gap-4 ${showOfferList ? 'lg:pe-[calc(914px-50vw)] xl:pe-[calc(1042px-50vw)] 2xl:pe-[calc(1154px-50vw)]' : ''} ${showFilterSheet || showOfferList ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} lg:gap-6 p-4 md:px-0 md:grid-cols-3 md:gap-5`}
       >
-        {products.map((product: Product) => {
+        {products.map((product: Product, idx) => {
+          const refProp = idx === products.length - 10 ? setLastRow : undefined;
           return (
             <ProductCard
               key={product?.id}
+              ref={refProp}
               product={product}
               addToCartDisabled={
                 isCheckoutLocationGlobal &&

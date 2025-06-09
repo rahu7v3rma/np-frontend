@@ -40,6 +40,8 @@ type ContextType = {
   handleResetFilter: () => void;
   includingTax: boolean;
   toggleIncludingTax: () => void;
+  hasUserChanged: boolean;
+  setHasUserChanged: (value: boolean) => void;
 };
 
 const initialFilterValues = {
@@ -65,6 +67,8 @@ export const ProductContext = createContext<ContextType>({
   handleResetFilter: () => {},
   includingTax: true,
   toggleIncludingTax: () => {},
+  hasUserChanged: false,
+  setHasUserChanged: () => {},
 });
 export function ProductWrapper({ children }: { children: ReactNode }) {
   const { campaign_code } = useParams<{ campaign_code: string }>();
@@ -90,7 +94,7 @@ export function ProductWrapper({ children }: { children: ReactNode }) {
       : undefined;
 
   const [filters, setFilters] = useState<FilterType>(initialFilterValues);
-
+  const [hasUserChanged, setHasUserChanged] = useState<boolean>(false);
   const toggleIncludingTax = () => {
     setIncludingTax((prev) => {
       const newValue = !prev;
@@ -98,7 +102,12 @@ export function ProductWrapper({ children }: { children: ReactNode }) {
       return newValue;
     });
   };
-
+  useEffect(() => {
+    const stored = localStorage.getItem('hasUserChanged');
+    if (stored) {
+      setHasUserChanged(JSON.parse(stored));
+    }
+  }, []);
   useEffect(() => {
     Promise.all([
       getFilters(
@@ -118,7 +127,6 @@ export function ProductWrapper({ children }: { children: ReactNode }) {
         ) {
           setFilters((prevFilters) => ({
             ...prevFilters,
-            priceRange: [0, (fixedMaxPriceData as any).max_price],
           }));
         } else {
           console.error('Unexpected data structure for max price');
@@ -227,6 +235,7 @@ export function ProductWrapper({ children }: { children: ReactNode }) {
     setProducts([]);
     eventEmitter.emit('resetPage', { page: '1' });
     setFilters(initialFilterValues);
+    setHasUserChanged(false);
   };
 
   return (
@@ -239,6 +248,8 @@ export function ProductWrapper({ children }: { children: ReactNode }) {
         handleResetFilter,
         toggleIncludingTax,
         includingTax,
+        hasUserChanged,
+        setHasUserChanged,
       }}
     >
       {children}

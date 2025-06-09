@@ -296,4 +296,10 @@ export default {
     continue: 'Continue',
   },
   voucherDetails: 'Voucher Details',
+  checkoutExchangeInstructions:
+    'If you wish to exchange your gifts, please revisit the website, go to your order page, and complete the exchange process. You can also contact our customer service team for assistance.',
+  inactiveCampaign:
+    'The campaign is currently inactive, so the order cannot be processed',
+  closeBtnLabel: 'Close',
+  inactiveLable: 'Inactive Campaign',
 } as const;

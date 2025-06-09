@@ -32,4 +32,5 @@ export interface CampaignDetailsType {
   campaign_type?: string;
   order_reference?: number;
   send_my_list?: boolean | null;
+  status?: string;
 }

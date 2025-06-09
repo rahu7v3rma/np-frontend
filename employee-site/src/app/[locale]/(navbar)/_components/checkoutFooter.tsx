@@ -12,7 +12,10 @@ import { useCurrentLocale, useI18n } from '@/locales/client';
 import { getList, fetchOrderDetails } from '@/services/api';
 import ConfirmationModal from '@/shared/modal';
 import { CUSTOMER_SERVICE_WHATSAPP_NUMBER } from '@/utils/const';
-import { generateCartProductsPDF } from '@/utils/downloadPdf';
+import {
+  generateCartProductsPDF,
+  generateDeliveryPDF,
+} from '@/utils/downloadPdf';
 
 import { CampaignContext } from '../../context/campaign';
 
@@ -56,8 +59,16 @@ export default function CheckoutComplete({
       const cartProductsList = await fetchOrderDetails(
         campaignDetails?.code ?? '',
       );
+
       setIsOrderDownloading(true);
-      generateCartProductsPDF(cartProductsList.products);
+
+      campaignDetails &&
+        generateDeliveryPDF(
+          cartProductsList,
+          campaignDetails?.delivery_location,
+          t,
+          locale,
+        );
       setTimeout(() => setIsOrderDownloading(false), 3000);
     }
   };

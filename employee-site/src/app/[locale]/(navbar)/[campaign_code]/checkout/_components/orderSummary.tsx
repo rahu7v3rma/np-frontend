@@ -214,7 +214,7 @@ export default function OrderSummary({
             ? giftPrice > budget
               ? t('common.approveAndPay')
               : t('common.approve')
-            : t('button.continue')}
+            : t('button.continue')}s
         </Button>
       </div>
       {campaignDetails?.campaign_type !== 'WALLET' &&

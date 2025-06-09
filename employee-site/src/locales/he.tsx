@@ -293,4 +293,9 @@ export default {
     continue: 'המשיכו',
   },
   voucherDetails: 'פרטי השובר',
+  checkoutExchangeInstructions:
+    'אם ברצונכם להחליף את המתנות, יש להיכנס לאתר מחדש, לגשת לעמוד ההזמנה ולבצע את ההחלפה. ניתן גם לפנות לשירות הלקוחות לקבלת סיוע.',
+  inactiveCampaign: 'הקמפיין אינו פעיל, לא ניתן להמשיך בהזמנה',
+  closeBtnLabel: 'לִסְגוֹר',
+  inactiveLable: 'מסע פרסום לא פעיל',
 } as const;

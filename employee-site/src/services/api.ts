@@ -482,25 +482,33 @@ export const getFilters = async (
   category?: string,
   filter?: FilterType,
 ): Promise<ProductFilterValue[]> => {
-  let url = API_END_POINT.FILTER_LOOKUP;
-  return await _callAuthenticatedAPI(
-    COMMON.stringFormat(url, code).concat(
-      `?lookup=${lookup}&lang=${lang}` +
-        (originalBudget !== undefined ? `&budget=${originalBudget}` : '') +
-        (tax !== undefined ? `&including_tax=${tax}` : '') +
-        (search ? `&q=${encodeURIComponent(search)}` : '') +
-        (category ? `&category=${encodeURIComponent(category)}` : ''),
+  try {
+    let url = COMMON.stringFormat(API_END_POINT.FILTER_LOOKUP, code);
+    let queryParams = [
+      `lookup=${lookup}`,
+      `lang=${encodeURIComponent(lang)}`,
+      originalBudget !== undefined ? `budget=${originalBudget}` : '',
+      tax !== undefined ? `including_tax=${tax}` : '',
+      search ? `q=${encodeURIComponent(search)}` : '',
+      category ? `category=${encodeURIComponent(category)}` : '',
       filter?.subcategory
-        ? `&sub_categories=${encodeURIComponent(filter?.subcategory.join(','))}`
+        ? `sub_categories=${encodeURIComponent(filter?.subcategory.join(','))}`
         : '',
       filter?.productKinds
-        ? `&product_kinds=${encodeURIComponent(filter?.productKinds.join(','))}`
+        ? `product_kinds=${encodeURIComponent(filter?.productKinds.join(','))}`
         : '',
       filter?.brand
-        ? `&brands=${encodeURIComponent(filter?.brand.join(','))}`
+        ? `brands=${encodeURIComponent(filter?.brand.join(','))}`
         : '',
-    ),
-  );
+    ].filter(Boolean);
+
+    url += `?${queryParams.join('&')}`;
+
+    return await _callAuthenticatedAPI(url);
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
 };
 
 export const getQuickOfferDetails = async (

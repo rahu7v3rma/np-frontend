@@ -33,6 +33,7 @@ import { isQuickOfferCampaign } from '@/utils/campaign';
 
 import BackLink from '../../_components/backLink';
 
+import InactiveCampaign from './_components/InactiveCampaign';
 import OrderSummary from './_components/orderSummary';
 import Payment from './_components/payment';
 import ProductConfirmationCard from './_components/productConfirmationCard';
@@ -77,6 +78,7 @@ export default function Page() {
   const [loading, setLoading] = useState<boolean>(false);
   const [countryCode, setCountryCode] = useState<any>('US');
   const [additionalCountryCode, setAdditionalCountryCode] = useState<any>('US');
+  const [isInactiveModal, setIsInactiveModal] = useState<boolean>(false);
 
   const [isOpen, setIsOpen] = useState(false);
   const { items, hasMore, isLoading, onLoadMore } = useCitiesList();
@@ -249,6 +251,10 @@ export default function Page() {
 
   const formRef = useRef<HTMLFormElement>(null);
   const handleCheckoutSubmit = useCallback(() => {
+    if (campaignDetails?.status === 'PREVIEW') {
+      setIsInactiveModal(true);
+      return;
+    }
     // load form data
     const formData = new FormData(formRef.current!);
     // convert form data to an object
@@ -998,6 +1004,12 @@ export default function Page() {
         onPaid={handlePaid}
         onPaymentClose={handlePaymentClose}
       />
+      {isInactiveModal && (
+        <InactiveCampaign
+          isOpen={isInactiveModal}
+          onClose={() => setIsInactiveModal(false)}
+        />
+      )}
     </section>
   );
 }

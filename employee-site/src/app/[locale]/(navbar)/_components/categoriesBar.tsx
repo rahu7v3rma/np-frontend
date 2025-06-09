@@ -291,9 +291,9 @@ const CategoriesBar: FunctionComponent<Props> = ({
         </div>
       </div>
       <div
-        className={`transition-[padding] flex items-center gap-2 mt-12 px-4 md:px-0 ${showOfferList ? 'lg:pe-[calc(914px-50vw)] xl:pe-[calc(1042px-50vw)] 2xl:pe-[calc(1154px-50vw)]' : ''}`}
+        className={`transition-[padding] flex items-center justify-between gap-10 mt-10 px-4 md:px-0 ${showOfferList ? 'lg:pe-[calc(914px-50vw)] xl:pe-[calc(1042px-50vw)] 2xl:pe-[calc(1154px-50vw)]' : ''}`}
       >
-        <div className="flex justify-center w-[87%]">
+        <div className="flex justify-center max-w-[65%] sm:max-w-[75%] md:max-w-[86%] flex-1">
           {!atScrollStart && (
             <Image
               className={
@@ -414,7 +414,7 @@ const CategoriesBar: FunctionComponent<Props> = ({
         <Button
           color={showFilterSheet ? 'secondary' : 'default'}
           variant="bordered"
-          className="justify-self-end"
+          className="justify-self-end px-2 py-[7px] h-9 w-20 font-semibold"
           startContent={<IoFilter size={20} />}
           onClick={toggleShowFilter}
         >

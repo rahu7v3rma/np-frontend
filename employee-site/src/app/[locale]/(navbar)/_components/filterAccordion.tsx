@@ -40,8 +40,13 @@ function FilterAccordion({
   campaignCode: string;
   triggerToast(text: string): void;
 }) {
-  const { filters, handleFilterChange, includingTax } =
-    useContext(ProductContext);
+  const {
+    filters,
+    handleFilterChange,
+    includingTax,
+    hasUserChanged,
+    setHasUserChanged,
+  } = useContext(ProductContext);
   const [productKinds, setProductKinds] = useState<ProductFilterValue[]>([]);
   const [brands, setBrands] = useState<BrandsType[] | null>(null);
   const [fixedMaxPrice, setfixedMaxPrice] = useState<MaxPrice | null>(null);
@@ -52,6 +57,9 @@ function FilterAccordion({
   const [search, setSearch] = useState<string>('');
   const [subCatOptions, setSubCatOption] = useState<SubcategoryItem[]>([]);
   const [showTooltip, setShowTooltip] = useState<boolean>(true);
+  const [checkCategoryId, setCheckCategoryId] = useState<string | undefined>(
+    '',
+  );
   const searchParams = useSearchParams();
   const { campaignDetails, campaignType } = useContext(CampaignContext);
 
@@ -88,73 +96,85 @@ function FilterAccordion({
       setSelectedColorOption(colorObj);
     }
   };
+  const initialRange = !isEmpty(filters.priceRange)
+    ? filters.priceRange
+    : [0, fixedMaxPrice?.max_price ?? 0];
+
+  const [localPriceRange, setLocalPriceRange] =
+    useState<number[]>(initialRange);
 
   useEffect(() => {
-    Promise.all([
-      getFilters(
-        campaignCode,
-        'product_kinds',
-        locale,
-        campaignType !== 'quick_offer_code' ? budgetInNumber : undefined,
-        undefined,
-        searchText,
-        categoryId,
-        filters,
-      ),
-      getFilters(
-        campaignCode,
-        'brands',
-        locale,
-        campaignType !== 'quick_offer_code' ? budgetInNumber : undefined,
-        undefined,
-        searchText,
-        categoryId,
-        filters,
-      ),
-      getFilters(
-        campaignCode,
-        'sub_categories',
-        locale,
-        campaignType !== 'quick_offer_code' ? budgetInNumber : undefined,
-        undefined,
-        searchText,
-        categoryId,
-        filters,
-      ),
-      getFilters(
-        campaignCode,
-        'max_price',
-        locale,
-        campaignType !== 'quick_offer_code' ? budgetInNumber : undefined,
-        campaignType === 'quick_offer_code' ? includingTax : undefined,
-        searchText,
-        categoryId,
-        filters,
-      ),
-    ])
-      .then(
-        ([
-          productKindsData,
-          brandsData,
-          subCategoryData,
-          fixedMaxPriceData,
-        ]) => {
-          setProductKinds(productKindsData);
-          setBrands(brandsData);
-          setSubCatOption(subCategoryData);
-          if (
-            typeof fixedMaxPriceData === 'object' &&
-            fixedMaxPriceData !== null &&
-            'max_price' in fixedMaxPriceData &&
-            typeof fixedMaxPriceData.max_price === 'number'
-          ) {
-            setfixedMaxPrice(fixedMaxPriceData as MaxPrice);
-          }
-        },
-      )
-      .catch(() => {
-        console.error('');
-      });
+    const debounceTimeout = setTimeout(() => {
+      Promise.all([
+        getFilters(
+          campaignCode,
+          'product_kinds',
+          locale,
+          campaignType !== 'quick_offer_code' ? budgetInNumber : undefined,
+          undefined,
+          searchText,
+          categoryId,
+          filters,
+        ),
+        getFilters(
+          campaignCode,
+          'brands',
+          locale,
+          campaignType !== 'quick_offer_code' ? budgetInNumber : undefined,
+          undefined,
+          searchText,
+          categoryId,
+          filters,
+        ),
+        getFilters(
+          campaignCode,
+          'sub_categories',
+          locale,
+          campaignType !== 'quick_offer_code' ? budgetInNumber : undefined,
+          undefined,
+          searchText,
+          categoryId,
+          filters,
+        ),
+        getFilters(
+          campaignCode,
+          'max_price',
+          locale,
+          campaignType !== 'quick_offer_code' ? budgetInNumber : undefined,
+          campaignType === 'quick_offer_code' ? includingTax : undefined,
+          searchText,
+          categoryId,
+          filters,
+        ),
+      ])
+        .then(
+          ([
+            productKindsData,
+            brandsData,
+            subCategoryData,
+            fixedMaxPriceData,
+          ]) => {
+            setProductKinds(productKindsData);
+            setBrands(brandsData);
+            setSubCatOption(subCategoryData);
+            onSelectionChange();
+            console.log('coming from filterAccordion page');
+            if (
+              typeof fixedMaxPriceData === 'object' &&
+              fixedMaxPriceData !== null &&
+              'max_price' in fixedMaxPriceData &&
+              typeof fixedMaxPriceData.max_price === 'number'
+            ) {
+              setfixedMaxPrice(fixedMaxPriceData as MaxPrice);
+            }
+          },
+        )
+        .catch((error) => {
+          console.error('Error fetching filters:', error);
+        });
+    }, 500);
+
+    return () => clearTimeout(debounceTimeout);
   }, [
     campaignCode,
     locale,
@@ -224,6 +244,48 @@ function FilterAccordion({
       setShowTooltip(true);
     }, 300);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('hasUserChanged', JSON.stringify(hasUserChanged));
+  }, [hasUserChanged]);
+
+  useEffect(() => {
+    if (!hasUserChanged) {
+      const newRange =
+        !isEmpty(filters.priceRange) &&
+        (filters.priceRange[0] > 0 || filters.priceRange[1] > 0)
+          ? filters.priceRange
+          : [0, fixedMaxPrice?.max_price ?? 0];
+      setLocalPriceRange(newRange);
+      filters.priceRange[1] = fixedMaxPrice?.max_price ?? 0;
+    }
+
+    const priceRange = filters.priceRange.every((val) => val === 0);
+    const getHasUserChanged = localStorage.getItem('hasUserChanged');
+
+    if (getHasUserChanged && priceRange) {
+      const newRange =
+        !isEmpty(filters.priceRange) &&
+        (filters.priceRange[0] > 0 || filters.priceRange[1] > 0)
+          ? filters.priceRange
+          : [0, fixedMaxPrice?.max_price ?? 0];
+      setLocalPriceRange(newRange);
+      filters.priceRange[1] = fixedMaxPrice?.max_price ?? 0;
+    }
+  }, [filters.priceRange, fixedMaxPrice, hasUserChanged]);
+
+  useEffect(() => {
+    if (checkCategoryId !== categoryId) {
+      setCheckCategoryId(categoryId);
+      const maxPrice = !hasUserChanged
+        ? fixedMaxPrice?.max_price
+        : filters?.priceRange[1];
+      const minPrice = !hasUserChanged ? 0 : filters?.priceRange[0];
+      setLocalPriceRange([minPrice, maxPrice || 0]);
+      filters.priceRange[1] = maxPrice ?? 0;
+      filters.priceRange[0] = minPrice;
+    }
+  }, [categoryId]);
 
   return (
     <Accordion
@@ -530,11 +592,7 @@ function FilterAccordion({
               step={1}
               maxValue={isOriginalBudget ? budget : fixedMaxPrice?.max_price}
               minValue={0}
-              value={
-                !isEmpty(filters.priceRange)
-                  ? filters.priceRange
-                  : [0, fixedMaxPrice?.max_price ?? 0]
-              }
+              value={localPriceRange}
               className="mt-[10px] p-[24px]"
               classNames={{
                 track: 'h-[2px] bg-[#B8B8C0] border-none',
@@ -558,6 +616,8 @@ function FilterAccordion({
               showTooltip={showTooltip}
               onChange={(val: number | number[]) => {
                 if (Array.isArray(val)) {
+                  setHasUserChanged(true);
+                  setLocalPriceRange(val);
                   if (!isOriginalBudget) {
                     handleFilterChange(
                       'priceRange',

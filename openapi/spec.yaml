@@ -220,6 +220,8 @@ paths:
                         type: integer
                       employee_name:
                         type: string
+                      status:
+                        type: string
               examples:
                 en:
                   value:
@@ -252,6 +254,7 @@ paths:
                       employee_name: First Last
                       login_page_image: /login.png
                       login_page_mobile_image: /login.png
+                      status: PREVIEW
                       # campaign_type: Quick Offer
                 he:
                   value:
@@ -283,6 +286,7 @@ paths:
                       employee_name: פרטי משפחה
                       login_page_image: /login.png
                       login_page_mobile_image: /login.png
+                      status: ACTIVE
         '404':
           description: Campaign does not exist
           content:
@@ -355,6 +359,7 @@ paths:
                           image: "gadgets-icon.svg"
                           imageWidth: 27
                           imageHeight: 34
+                          order: 1
                         - id: 2
                           name: "Gadgets"
                           image: "gadgets-icon.svg"
@@ -370,21 +375,25 @@ paths:
                           image: 'camping-icon.svg'
                           imageWidth: 35
                           imageHeight: 35
+                          order: 2
                         - id: 5
                           name: 'Garden'
                           image: 'garden-icon.svg'
                           imageWidth: 37
                           imageHeight: 39
+                          order: 3
                         - id: 6
                           name: 'Home Appliance'
                           image: 'home-appliance-icon.svg'
                           imageWidth: 32
                           imageHeight: 32
+                          order: 4
                         - id: 7
                           name: 'Home Decor'
                           image: 'home-decor-icon.svg'
                           imageWidth: 41.25
                           imageHeight: 31.64
+                          order: 5
                         - id: 8
                           name: 'Home Decor'
                           image: 'home-decor-icon.svg'
@@ -1423,9 +1432,95 @@ paths:
                     message: Employee order fetched successfully.
                     status: 200
                     data:
-                      reference: 12345
-                      order_date_time: "2024-08-01T12:00:00.000000Z"
-                      added_payment: true
+                      full_name: null
+                      added_payment: false
+                      reference: 88
+                      order_date_time: "2025-03-21T11:56:49.394644+02:00"
+                      products:
+                        - quantity: 1
+                          product:
+                            id: 1
+                            name: "oven en"
+                            description: |
+                              Description en
+                              Description en
+                              Description en
+                              Description en
+                            sku: "oven_1"
+                            link: "https://en.wikipedia.org/wiki/Google "
+                            technical_details: "Technical details en"
+                            warranty: "Warranty [en]"
+                            exchange_value: 15
+                            exchange_policy: "Exchange policy [en]"
+                            product_type: "REGULAR"
+                            product_kind: "MONEY"
+                            brand:
+                              name: "Kitchen en"
+                              logo_image: null
+                            supplier:
+                              name: "Hassam Hassan en"
+                            images:
+                              - main: true
+                                image: "/product-img.png"
+                            categories:
+                              - id: 2
+                                name: "Kitchen en"
+                                icon_image: null
+                                order: 0
+                              - id: 4
+                                name: "test 1"
+                                icon_image: null
+                                order: 0
+                              - id: 5
+                                name: "test 2"
+                                icon_image: null
+                                order: 0
+                              - id: 6
+                                name: "test 3"
+                                icon_image: null
+                                order: 0
+                              - id: 7
+                                name: "test 4"
+                                icon_image: null
+                                order: 0
+                              - id: 8
+                                name: "test 5"
+                                icon_image: null
+                                order: 0
+                              - id: 9
+                                name: "test 6"
+                                icon_image: null
+                                order: 0
+                              - id: 10
+                                name: "test 7"
+                                icon_image: null
+                                order: 0
+                              - id: 11
+                                name: "test 8"
+                                icon_image: null
+                                order: 0
+                              - id: 12
+                                name: "test 9"
+                                icon_image: null
+                                order: 0
+                              - id: 13
+                                name: "test 10"
+                                icon_image: null
+                                order: 0
+                            calculated_price: 40
+                            extra_price: 0
+                            remaining_quantity: 2147483646
+                            voucher_type: "PHYSICAL"
+                            discount_rate: 17
+                            voucher_value: 40
+                      phone_number: "0538475864"
+                      additional_phone_number: null
+                      delivery_city: 'delivery city'
+                      delivery_street: 'delivery street'
+                      delivery_street_number: 'delivery street number'
+                      delivery_apartment_number: 'delivery apartment number'
+                      delivery_additional_details: 'delivery additional details'
+                      office_delivery_address: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo 
         '401':
           description: Unauthorized request
           content:
@@ -2129,7 +2224,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [product_types, brand, subCategories]
+            enum: [product_types, brand, subCategories, max_price]
         - name: tax
           in: query
           required: false
