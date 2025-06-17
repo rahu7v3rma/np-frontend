@@ -1,14 +1,18 @@
 'use client';
 
 import { Icon } from '@iconify/react';
-import { Button, Tooltip } from '@nextui-org/react';
+import { Button, Input, Switch, Tooltip } from '@nextui-org/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 
 import { CampaignContext } from '@/app/[locale]/context/campaign';
+import { useSendEmail } from '@/hooks/useSendEmail';
 import { useI18n } from '@/locales/client';
 import ConfirmationModal from '@/shared/modal';
+import { SendEmailProps } from '@/types/order';
+
+import SendEmail from './SendEmail';
 
 type ProductConfirmation = {
   product: any;
@@ -17,6 +21,7 @@ type ProductConfirmation = {
   onCancel: () => void;
   onSubmit: () => void;
   productLinks?: boolean;
+  sendEmailValues: SendEmailProps;
 };
 
 export default function ProductConfirmationCard({
@@ -26,6 +31,7 @@ export default function ProductConfirmationCard({
   onCancel,
   onSubmit,
   productLinks = true,
+  sendEmailValues,
 }: ProductConfirmation) {
   const [isOpen, setIsopen] = useState<boolean>(false);
   const t = useI18n();
@@ -141,6 +147,7 @@ export default function ProductConfirmationCard({
             </>
           )}
         </div>
+        <SendEmail {...sendEmailValues} />
         <div className="mt-5">
           {product?.product_type === 'SENT_BY_SUPPLIER' && (
             <h3 className="text-red-600 text-small mb-5">

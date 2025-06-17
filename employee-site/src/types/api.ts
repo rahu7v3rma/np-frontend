@@ -24,6 +24,7 @@ export type OrderPayload = {
   country: string;
   state_code: string;
   zip_code: number;
+  additional_email?: string;
 };
 
 export enum LoginMethods {

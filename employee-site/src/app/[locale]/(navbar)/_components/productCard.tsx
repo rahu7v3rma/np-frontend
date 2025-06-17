@@ -278,54 +278,59 @@ const ProductCard = forwardRef<HTMLDivElement, props>(
                       />
                     </Button>
                   )}
-                  {!isQuickOfferCampaign(campaignType ?? '') &&
-                    campaignDetails?.product_selection_mode === 'MULTIPLE' && (
-                      <>
-                        <Tooltip
-                          color="primary"
-                          content={t('cart.addToCart')}
-                          delay={1000}
-                        >
-                          <Button
-                            variant="light"
-                            isIconOnly
-                            id="addToCartButton"
-                            onClick={() =>
-                              onAddToCart(
-                                product.id,
-                                selectedColorVariation
-                                  ? {
-                                      [selectedColorVariation.site_name]:
-                                        selectedColorVariation.name,
-                                    }
-                                  : undefined,
-                              )
-                            }
-                            isDisabled={
-                              campaignDetails.campaign_type === 'WALLET'
-                                ? addToCartDisabled ||
+                  {((!isQuickOfferCampaign(campaignType ?? '') &&
+                    campaignDetails?.product_selection_mode === 'MULTIPLE') ||
+                    campaignDetails?.status === 'PREVIEW') && (
+                    <>
+                      <Tooltip
+                        color="primary"
+                        content={t('cart.addToCart')}
+                        delay={1000}
+                      >
+                        <Button
+                          variant="light"
+                          isIconOnly
+                          id="addToCartButton"
+                          onClick={() =>
+                            onAddToCart(
+                              product.id,
+                              selectedColorVariation
+                                ? {
+                                    [selectedColorVariation.site_name]:
+                                      selectedColorVariation.name,
+                                  }
+                                : undefined,
+                            )
+                          }
+                          isDisabled={
+                            product.variations?.some(
+                              (v) => v.variation_kind === 'TEXT',
+                            ) ||
+                            ((campaignDetails.campaign_type === 'WALLET'
+                              ? addToCartDisabled ||
+                                isOutOfStock ||
+                                isColorVariationProduct
+                                ? !selectedColorVariation
+                                : false
+                              : addToCartDisabled ||
+                                  campaignDetails?.employee_order_reference !==
+                                    null ||
                                   isOutOfStock ||
                                   isColorVariationProduct
-                                  ? !selectedColorVariation
-                                  : false
-                                : addToCartDisabled ||
-                                    campaignDetails?.employee_order_reference !==
-                                      null ||
-                                    isOutOfStock ||
-                                    isColorVariationProduct
-                                  ? !selectedColorVariation
-                                  : false
-                            }
-                          >
-                            <Icon
-                              style={{ pointerEvents: 'none' }}
-                              icon="solar:cart-plus-bold"
-                              fontSize={24}
-                            />
-                          </Button>
-                        </Tooltip>
-                      </>
-                    )}
+                                ? !selectedColorVariation
+                                : false) &&
+                              campaignDetails.status !== 'preview')
+                          }
+                        >
+                          <Icon
+                            style={{ pointerEvents: 'none' }}
+                            icon="solar:cart-plus-bold"
+                            fontSize={24}
+                          />
+                        </Button>
+                      </Tooltip>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

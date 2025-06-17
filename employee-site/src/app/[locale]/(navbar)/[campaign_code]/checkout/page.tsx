@@ -24,6 +24,7 @@ import { CITIES } from '@/constants/cities';
 import { COUNTRIES } from '@/constants/countries';
 import { STATES } from '@/constants/states';
 import { useCitiesList } from '@/hooks/useCitiesList';
+import { useSendEmail } from '@/hooks/useSendEmail';
 import { useI18n, useCurrentLocale } from '@/locales/client';
 import { createOrder } from '@/services/api';
 import Input, { InputWithForward } from '@/shared/Input';
@@ -85,6 +86,7 @@ export default function Page() {
   // State to hold country options
   const [countryOptions, setCountryOptions] = useState<OptionItem[]>([]);
   const [showPhoneInput, setShowPhoneInput] = useState<boolean>(false);
+  const sendEmailValues = useSendEmail();
 
   useEffect(() => {
     const locale = currentLocale === 'en' ? 'en' : 'he';
@@ -226,6 +228,12 @@ export default function Page() {
           campaignType || '',
         );
 
+        //  Check campaign_status in API response
+        if (res?.campaign_status === 'PREVIEW') {
+          setIsInactiveModal(true);
+          fetchCartItems && fetchCartItems();
+          return;
+        }
         // refresh campaign details to account for created order
         fetchCampaignDetails && fetchCampaignDetails();
 
@@ -251,10 +259,6 @@ export default function Page() {
 
   const formRef = useRef<HTMLFormElement>(null);
   const handleCheckoutSubmit = useCallback(() => {
-    if (campaignDetails?.status === 'PREVIEW') {
-      setIsInactiveModal(true);
-      return;
-    }
     // load form data
     const formData = new FormData(formRef.current!);
     // convert form data to an object
@@ -302,11 +306,15 @@ export default function Page() {
       country: formDataObj.deliveryCountry,
       state_code: formDataObj.deliveryStateCode,
       zip_code: formDataObj.deliveryZipCode,
+      ...(sendEmailValues.isSendEmail && {
+        additional_email: sendEmailValues.emailValue,
+      }),
     };
 
     orderPayloadRef.current = payload;
     postOrder(payload);
   }, [
+    sendEmailValues,
     additionalCountryCode,
     campaignDetails,
     countryCode,
@@ -356,7 +364,6 @@ export default function Page() {
     },
     [],
   );
-
   useEffect(() => {
     const locale = currentLocale === 'en' ? 'en' : 'he';
     const randomIdx = () => Math.floor(Math.random() * 1000); // Generate a random index value
@@ -982,6 +989,7 @@ export default function Page() {
             }}
             onSubmit={handleCheckoutSubmit}
             productLinks={false}
+            sendEmailValues={sendEmailValues}
           />
         ) : (
           <div>
@@ -995,6 +1003,7 @@ export default function Page() {
               }
               onSubmit={handleCheckoutSubmit}
               productLinks={false}
+              sendEmailValues={sendEmailValues}
             />
           </div>
         )}

@@ -23,6 +23,7 @@ import { FaMinus, FaPlus } from 'react-icons/fa6';
 
 import { CampaignContext } from '@/app/[locale]/context/campaign';
 import { CartContext } from '@/app/[locale]/context/cart';
+import { useSendEmail } from '@/hooks/useSendEmail';
 import { useI18n, useCurrentLocale } from '@/locales/client';
 import ConfirmationModal from '@/shared/modal';
 import MultiSelectPrice from '@/shared/MultiSelectPrice';
@@ -185,6 +186,7 @@ export default function Page() {
       ),
     [cart],
   );
+  const sendEmailValues = useSendEmail();
 
   const giftBudget = campaignDetails?.budget_per_employee || 0;
   const isCheckoutLocationGlobal =
@@ -475,6 +477,7 @@ export default function Page() {
               budget={campaignDetails?.budget_per_employee ?? 0}
               onSubmit={handleCartSubmit}
               displayProducts={false}
+              sendEmailValues={sendEmailValues}
             />
           )}
         </div>

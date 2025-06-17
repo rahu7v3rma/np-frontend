@@ -20,7 +20,7 @@ function Input({
           base: '!mt-0',
           input: `text-base md:text-small ${isInvalid ? '!text-[#363829] group-focus-within:!text-[#363839]' : 'text-[#363839]'}`,
           inputWrapper: `[&>div]:h-[22px] border-1 py-4 px-[14px] text-[14px] font-[400] h-auto ${isInvalid ? '!border-[#FF5630] group-focus-within:!border-[#363839] border-2' : 'border-[#BDBDBD7A]'} ${value ? 'border-[#363839] text-[#363839]' : 'border-[#BDBDBD7A]'} group-focus-within:${value ? 'border-1' : 'border-2'} group-hover:border-[#363839]`,
-          label: `!text-[#BDBDBD] text-[14px] leading-[12px] font-[400] bg-white w-max ${!value ? 'group-focus-within:!text-[#363839]' : ''} group-focus-within:text-[12px] group-focus-within:mt-[6px] group-focus-within:ml-[11px] group-focus-within:px-[3px] ${value ? '!text-category-default ml-[11px] px-[3px] text-[12px] font-[600] leading-[12px] mt-[6px]' : ''} group-focus-within:font-[600] ${isInvalid ? '!text-[#FF5630] group-focus-within:!text-[#363839]' : ''}`,
+          label: `!text-[#363839] text-[14px] leading-[12px] font-[400] bg-white w-max ${!value ? 'group-focus-within:!text-[#868788]' : ''} group-focus-within:text-[12px] group-focus-within:mt-[6px] group-focus-within:ml-[11px] group-focus-within:px-[3px] ${value ? '!text-category-default ml-[11px] px-[3px] text-[12px] font-[600] leading-[12px] mt-[6px]' : ''} group-focus-within:font-[600] ${isInvalid ? '!text-[#FF5630] group-focus-within:!text-[#363839]' : ''} bg-[#FDF8EC]`,
         }}
         {...props}
       />

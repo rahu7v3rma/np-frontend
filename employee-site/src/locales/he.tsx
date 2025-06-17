@@ -30,12 +30,12 @@ export default {
     form: {
       title: 'התחבר לאתר המתנות של',
       titleVoucherMode: 'להתחברות הזינו קוד שובר',
-      phoneModeDescription: 'הכנס את מספר הטלפון שלך, קבל את הקוד והתחבר.',
+      phoneModeDescription: 'הכניסו את מספר הטלפון שלכם והתחברו',
       phoneModePlaceholder: 'מספר טלפון',
       emailModeDescription: 'הכנס את אימייל העבודה שלך, קבל קוד והתחבר.',
       emailModePlaceholder: 'אימייל העבודה שלך',
-      idModeDescription: 'הכנס ת.ז / מספר עובד בהתאם להנחיות החברה והתחבר.',
-      idModePlaceholder: 'ת.ז שלך',
+      idModeDescription: 'הכניסו את ת.ז שלכם והתחברו',
+      idModePlaceholder: 'מספר ת.ז',
       voucherModePlaceholder: 'קוד שובר',
       buttonText: 'התחבר',
       ValidEmail: 'נא להזין דוא"ל חוקי',
@@ -43,10 +43,14 @@ export default {
       OtpNotSent: 'קוד התחברות לא נשלח',
       SomethingWentWrong: 'משהו השתבש',
       wrongCredentials: 'דוא"ל או סיסמה שגויים. אנא בדקו את פרטיכם ונסו שוב',
+      userNotFound: 'הפרטים שהזנת אינם נכונים, בדוק את הפרטים והזן מחדש',
       wrongVoucherCode:
         'קוד השובר שלך שגוי, אנא נסה שוב או צור קשר עם שירות הלקוחות.',
+      customerServices: 'לסיוע בהתחברות',
+      phoneNumberTitle: 'ברוכים הבאים לאתר המתנות שלכם לחג, חג שמח לכולם',
     },
     otpForm: {
+      title: 'ברוכים הבאים לאתר המתנות שלכם לחג, חג שמח לכולם',
       enterCodePhone: 'הזינו את הקוד שקיבלתם ב-SMS',
       enterCodeEmail: 'הזינו את הקוד האימות שנשלח אליכם ב-אימייל',
       codeTimeOut: '5:00',
@@ -58,6 +62,8 @@ export default {
     inactiveCampaign: {
       title: 'היי, נראה שאתר המתנות שלך נסגר.',
       description: 'אנא פנה לגורם האחראי בארגון.',
+      smallScreenTitle: 'היי, נראה שאתר המתנות שלך נסגר.',
+      customerService: 'לסיוע בהתחברות',
     },
   },
   button: {
@@ -164,6 +170,9 @@ export default {
     voucherPhoneNumber: 'הוסיפו טלפון בשביל השובר',
     voucherPhoneDescription:
       'לקבלת השובר ב-SMS יש להזין את מספר הטלפון שלכם (קבלת השובר אינה מיידית).',
+    emailConfirmation: 'תשלחו לי אישור הזמנה באימייל',
+    emailPlaceholder: 'אימייל',
+    emailError: 'האימייל שהוזן אינו תקין, אנא נסה שוב.',
   },
   order: {
     scancode: 'סרקו לעמוד ההזמנות באתר',

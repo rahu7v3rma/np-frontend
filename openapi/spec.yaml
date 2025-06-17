@@ -220,8 +220,6 @@ paths:
                         type: integer
                       employee_name:
                         type: string
-                      status:
-                        type: string
               examples:
                 en:
                   value:
@@ -254,7 +252,6 @@ paths:
                       employee_name: First Last
                       login_page_image: /login.png
                       login_page_mobile_image: /login.png
-                      status: PREVIEW
                       # campaign_type: Quick Offer
                 he:
                   value:
@@ -286,7 +283,6 @@ paths:
                       employee_name: פרטי משפחה
                       login_page_image: /login.png
                       login_page_mobile_image: /login.png
-                      status: ACTIVE
         '404':
           description: Campaign does not exist
           content:
@@ -2471,6 +2467,13 @@ paths:
                     message: Bad credentials.
                     status: 401
                     data: {}
+                user_not_registered:
+                  value:
+                      success: false
+                      code: user_not_registered
+                      message: The details you entered are incorrect, check the details and re-enter'.
+                      status: 401
+                      data: {}
                 bad_otp:
                   value:
                     success: false

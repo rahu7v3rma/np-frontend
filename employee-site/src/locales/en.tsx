@@ -30,13 +30,12 @@ export default {
     form: {
       title: 'Log in to the gifts website',
       titleVoucherMode: 'Insert Your Voucher Code',
-      phoneModeDescription: 'Enter your phone number, get a code and log in.',
+      phoneModeDescription: 'Enter your phone number and connect.',
       phoneModePlaceholder: 'Phone Number',
       emailModeDescription: 'Enter your work email, get a code and log in.',
       emailModePlaceholder: 'Your work email',
-      idModeDescription:
-        "Enter your ID / employee number according to the company's instructions and log in.",
-      idModePlaceholder: 'Your ID',
+      idModeDescription: 'Enter your ID and log in.',
+      idModePlaceholder: 'ID Number',
       voucherModePlaceholder: 'Voucher Code',
       buttonText: 'Login',
       ValidEmail: 'Please Enter Valid Email',
@@ -47,8 +46,13 @@ export default {
         'Invalid email or password. Please check your credentials and try again',
       wrongVoucherCode:
         'Your voucher code is incorrect, please try again or contact customer service.',
+      userNotFound:
+        'The details you entered are incorrect, check the details and re-enter',
+      customerServices: 'Customer Service',
+      phoneNumberTitle: 'Welcome to your holiday gift site, Happy Holidays',
     },
     otpForm: {
+      title: 'Welcome to your holiday gift site, Happy Holidays',
       enterCodePhone: 'Enter the code you received in SMS',
       enterCodeEmail: 'Enter the code you received in The Email',
       codeTimeOut: '5:00',
@@ -62,6 +66,8 @@ export default {
       title: 'It appears that your giveaway site is currently down.',
       description:
         'Could you please contact the appropriate person in your organization.',
+      smallScreenTitle: 'Welcome to your holiday gift site, Happy Holidays',
+      customerService: 'Customer Service',
     },
   },
   button: {
@@ -169,6 +175,9 @@ export default {
     voucherPhoneNumber: 'Add phone number for voucher',
     voucherPhoneDescription:
       'To receive the voucher via SMS, please enter your phone number (receiving the voucher is not immediate)',
+    emailConfirmation: 'Send me an order confirmation via email',
+    emailPlaceholder: 'Email',
+    emailError: 'The email entered is invalid, please try again.',
   },
   order: {
     scancode: 'Scan to the order page',

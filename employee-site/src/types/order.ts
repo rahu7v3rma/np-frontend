@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Product, ProductCart } from './product';
 
 export type Order = {
@@ -15,4 +17,12 @@ export type Order = {
   delivery_street_number: string;
   delivery_apartment_number: string;
   delivery_additional_details: string;
+};
+
+export type SendEmailProps = {
+  emailValue: string;
+  setEmailValue: React.Dispatch<React.SetStateAction<string>>;
+  isSendEmail: boolean;
+  setIsSendEmail: React.Dispatch<React.SetStateAction<boolean>>;
+  isInvalid: boolean;
 };

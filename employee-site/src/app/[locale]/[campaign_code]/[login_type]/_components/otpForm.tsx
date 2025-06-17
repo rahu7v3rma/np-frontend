@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { Button, Input } from '@nextui-org/react';
@@ -5,6 +6,7 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import {
   FormEvent,
+  Fragment,
   FunctionComponent,
   useCallback,
   useEffect,
@@ -15,7 +17,7 @@ import { useI18n } from '@/locales/client';
 import { postLogin, getCampaignType } from '@/services/api';
 import { LoginMethods, LoginPayload } from '@/types/api';
 
-const OTP_DIGITS = 6;
+const OTP_DIGITS = 5;
 const RESEND_CODE_SECONDS = 5 * 60;
 
 type Props = {
@@ -199,103 +201,117 @@ const OTPForm: FunctionComponent<Props> = ({
   }, [loginPayload, campaign_code]);
 
   return (
-    <form
-      className="flex flex-col gap-[32px] w-full"
-      onSubmit={handleFormSubmit}
-    >
-      <div className="flex flex-col gap-[16px]">
-        <span
-          className={'text-[24px] leading-[36px] font-[700] text-[#363839]'}
-        >
-          {t('login.form.title')}
-        </span>
-        <span
-          className={'text-[24px] leading-[36px] font-[700] text-[#363839]'}
-        >
-          {organizationName}
-        </span>
-        <div className="flex justify-between relative items-start">
-          <div className={'flex flex-col'}>
-            <span
-              className={'text-[14px] leading-[22px] font-[400] text-[#363839]'}
-            >
-              {login_type === LoginMethods.email
-                ? t('login.otpForm.enterCodeEmail')
-                : t('login.otpForm.enterCodePhone')}
-            </span>
-            <span
-              className={'text-[14px] leading-[22px] font-[600] text-[#363839]'}
-            >
+    <div className="w-full max-w-[494px] bg-white/70 rounded-[20px] p-8 shadow-[0_4px_24px_0_rgba(0,0,0,0.08)] sm:right-[10%]">
+      <form
+        className="flex flex-col items-center gap-6 w-full max-w-md mx-auto md:p-8 sm:p-4 rounded-lg"
+        onSubmit={handleFormSubmit}
+      >
+        <div className="flex flex-col items-center gap-4 w-full text-center">
+          <img
+            src="/checkout_icon.svg"
+            alt="Logo"
+            className="w-[154px] h-[77px]"
+          />
+          <h1 className="text-2xl font-bold text-[#363839]">
+            {t('login.otpForm.title')}
+          </h1>
+          <div className="w-full text-start px-5">
+            <div className="flex justify-between items-center w-full">
+              <p className="text-[14px] text-[#363839] flex items-center justify-center gap-2">
+                {login_type === LoginMethods.email
+                  ? t('login.otpForm.enterCodeEmail')
+                  : t('login.otpForm.enterCodePhone')}
+              </p>
+              <img
+                src="/primary-shape.svg"
+                alt="retry"
+                className="w-[14px] h-[14px]"
+              />
+            </div>
+            <span className="text-[14px] font-semibold text-[#363839]">
               {formatTime(timer)}
             </span>
           </div>
-          <Image
-            src="/refresh-icon.svg"
-            alt="Refresh Icon"
-            width={20}
-            height={20}
-            className={'mt-1 cursor-pointer'}
-            priority
-            onClick={() => window.location.reload()}
-          />
         </div>
-      </div>
-      <div
-        dir="ltr" // so code digit inputs are not reversed
-        className={`flex w-full justify-between ${isIOS ? 'gap-3' : ''}`}
-      >
-        {numbers.map((element, idx) => (
-          <Input
-            type="tel"
-            variant="bordered"
-            name={`number${idx}`}
-            key={`number${idx}`}
-            id={`${idx}`}
-            classNames={{
-              base: ['max-w-[55px] h-[54px]'],
-              inputWrapper: ['h-full p-0 border-1 border-[#BDBDBD7A]'],
-              input: [
-                'rounded-md font-[400] text-[14px] leading-[22px] text-center color-[#363839]',
-              ],
-            }}
-            placeholder="-"
-            maxLength={1}
-            value={numbers[idx]}
-            onChange={handleInputChange}
-            onKeyDown={handleInputKeyDown}
-            autoFocus={idx === 0}
-          />
-        ))}
-      </div>
-      <div className={'flex flex-col gap-[20px]'}>
-        <Button
-          color="primary"
-          size="lg"
-          className={
-            'h-[48px] bg-[#363839] text-[15px] leading-[26px] font-[700] text-white'
-          }
-          isDisabled={isSubmitDisabled}
-          type="submit"
-        >
-          {t('login.form.buttonText')}
-        </Button>
-        <div className={'h-max flex gap-1'}>
-          <span
-            className={'text-[14px] leading-[22px] font-[300] text-[#363839]'}
-          >
-            {t('login.otpForm.notReceiveCode')}
-          </span>
-          <span
-            onClick={resendCode}
-            className={
-              'text-[14px] leading-[22px] font-[600] text-[#363839] cursor-pointer'
-            }
-          >
-            {t('login.otpForm.resendCode')}
-          </span>
+
+        <div className="flex gap-3 justify-center w-full mb-4">
+          {numbers.map((element, idx) => (
+            <Fragment key={`number${idx}`}>
+              <Input
+                type="tel"
+                name={`number${idx}`}
+                id={`${idx}`}
+                classNames={{
+                  base: ['w-[55.8px] h-[54px]'],
+                  inputWrapper: [
+                    'h-full p-0 border-1 border-[#BDBDBD7A] hover:border-[#363839] rounded-lg bg-transparent',
+                  ],
+                  input: ['text-[14px] font-medium text-center text-[#363839]'],
+                }}
+                placeholder="-"
+                maxLength={1}
+                value={element}
+                onChange={handleInputChange}
+                onKeyDown={handleInputKeyDown}
+                autoComplete="one-time-code"
+              />
+            </Fragment>
+          ))}
         </div>
-      </div>
-    </form>
+
+        <div className="flex flex-col gap-4 w-full">
+          <Button
+            type="submit"
+            className="w-full bg-[#363839] text-white rounded-lg py-[12px] font-bold text-[16px]"
+            isDisabled={isSubmitDisabled}
+          >
+            {t('login.form.buttonText')}
+          </Button>
+
+          <div className="flex items-center justify-start text-[14px] text-[#363839]">
+            <span className="mr-1 font-light">
+              {t('login.otpForm.notReceiveCode')}
+            </span>
+            <Button
+              type="button"
+              className="text-[#363839] bg-transparent font-medium p-0 h-auto min-w-0 text-[14px]"
+              onClick={resendCode}
+            >
+              {t('login.otpForm.resendCode')}
+            </Button>
+          </div>
+
+          <div className="flex justify-center w-full mt-2">
+            <div className="flex items-center justify-center gap-2 w-fit rounded-md border border-[#BDBDBD52] py-2 px-4">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10.0025 0H9.9975C4.48375 0 0 4.485 0 10C0 12.1875 0.705 14.215 1.90375 15.8612L0.6575 19.5763L4.50125 18.3475C6.0825 19.395 7.96875 20 10.0025 20C15.5162 20 20 15.5138 20 10C20 4.48625 15.5162 0 10.0025 0ZM15.8212 14.1213C15.58 14.8025 14.6225 15.3675 13.8587 15.5325C13.3363 15.6437 12.6537 15.7325 10.3562 14.78C7.4175 13.5625 5.525 10.5763 5.3775 10.3825C5.23625 10.1887 4.19 8.80125 4.19 7.36625C4.19 5.93125 4.91875 5.2375 5.2125 4.93375C5.45375 4.68625 5.8525 4.57375 6.235 4.57375C6.35875 4.57375 6.47 4.58 6.57 4.585C6.86375 4.5975 7.01125 4.615 7.205 5.07875C7.44625 5.66 8.03375 7.095 8.10375 7.2425C8.175 7.39 8.24625 7.59 8.14625 7.78375C8.0525 7.98375 7.97 8.0725 7.8225 8.2425C7.675 8.4125 7.535 8.5425 7.3875 8.725C7.2525 8.88375 7.1 9.05375 7.27 9.3475C7.44 9.635 8.0275 10.5937 8.8925 11.3637C10.0087 12.3575 10.9137 12.675 11.2375 12.81C11.4787 12.91 11.7662 12.8863 11.9425 12.6988C12.1663 12.4575 12.4425 12.0575 12.7238 11.6638C12.9237 11.3813 13.1763 11.3462 13.4412 11.4462C13.7113 11.54 15.14 12.2462 15.4338 12.3925C15.7275 12.54 15.9212 12.61 15.9925 12.7338C16.0625 12.8575 16.0625 13.4388 15.8212 14.1213Z"
+                  fill="#25D366"
+                />
+              </svg>
+              <Button
+                type="button"
+                className="text-[#363839] bg-transparent font-bold p-0 h-auto min-w-0 text-[14px]"
+                onClick={() => {
+                  const url = isIOS
+                    ? `whatsapp://send?phone=${process.env.NEXT_PUBLIC_CUSTOMER_SERVICE_PHONE}`
+                    : `https://wa.me/${process.env.NEXT_PUBLIC_CUSTOMER_SERVICE_PHONE}`;
+                  window.open(url, '_blank');
+                }}
+              >
+                {t('button.customerService')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 };
 

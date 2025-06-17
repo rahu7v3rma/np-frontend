@@ -11,7 +11,7 @@ export default async function Product({
   params: { campaign_code: string; id: number; share: string };
   searchParams?: { [key: string]: string };
 }) {
-  const locale = getCurrentLocale();
+  const locale = await getCurrentLocale();
   const product = await fetchShareItems(
     params.campaign_code,
     searchParams?.share ?? '',

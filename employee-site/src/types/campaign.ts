@@ -26,6 +26,7 @@ export interface CampaignDetailsType {
   budget_per_employee: number;
   employee_order_reference: number | null;
   employee_name: string;
+  employee_email: string;
   login_page_image: string;
   login_page_mobile_image: string;
   check_out_location: string;

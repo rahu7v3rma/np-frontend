@@ -2,6 +2,7 @@
 
 import { Button } from '@nextui-org/react';
 import * as Sentry from '@sentry/nextjs';
+import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import {
   FormEvent,
@@ -21,12 +22,14 @@ type Props = {
   organizationName: string;
   campaignType?: string;
   onLoginSuccess: (loginPayload: LoginPayload) => void;
+  lang?: string;
 };
 
 const LoginForm: FunctionComponent<Props> = ({
   organizationName,
   campaignType,
   onLoginSuccess,
+  lang,
 }: Props) => {
   const t = useI18n();
   const router = useRouter();
@@ -112,6 +115,11 @@ const LoginForm: FunctionComponent<Props> = ({
         // should enter otp code now
         onLoginSuccess(loginPayload);
       } else if (
+        err.status === 401 &&
+        err.data?.code === 'user_not_registered'
+      ) {
+        setErrorMessage(t('login.form.userNotFound'));
+      } else if (
         (err.status === 401 && err.data?.code === 'bad_credentials') ||
         (err.status === 400 && err.data?.code === 'request_invalid')
       ) {
@@ -157,12 +165,13 @@ const LoginForm: FunctionComponent<Props> = ({
     >
       <div className="flex flex-col gap-[16px]">
         <span
-          className={'text-[24px] leading-[36px] font-[700] text-[#363839]'}
+          className={`text-[24px] leading-[36px] text-[#363839] text-center ${
+            lang === 'he' ? 'font-[600]' : 'font-[700]'
+          }`}
         >
-          {login_type === LoginMethods.voucherCode
-            ? t('login.form.titleVoucherMode')
-            : t('login.form.title')}
+          {t('login.form.phoneNumberTitle')}
         </span>
+
         {campaignType !== 'WALLET' && (
           <span
             className={'text-[24px] leading-[36px] font-[700] text-[#363839]'}
@@ -171,7 +180,9 @@ const LoginForm: FunctionComponent<Props> = ({
           </span>
         )}
         <span
-          className={'text-[14px] leading-[22px] font-[400] text-[#363839]'}
+          className={
+            'text-[16px] leading-[24px] font-[600] text-[#363839] text-center'
+          }
         >
           {modeText}
         </span>
@@ -202,6 +213,19 @@ const LoginForm: FunctionComponent<Props> = ({
       >
         {t('login.form.buttonText')}
       </Button>
+      <div className="flex flex-row justify-center h-[43px] items-center self-center border-1 border-[#BDBDBD52] rounded-[8px] m-2 py-[9px] px-[19px] mt-[8px]">
+        <Image
+          className="relative object-contain w-auto h-full max-h-10"
+          src={'/whatsapp-icon.svg'}
+          alt="Organization logo"
+          width={19}
+          height={19}
+          priority
+        />
+        <div className="px-2 text-[14px] leading-[24px] font-[700] text-[#363839]">
+          {t('login.form.customerServices')}
+        </div>
+      </div>
     </form>
   );
 };

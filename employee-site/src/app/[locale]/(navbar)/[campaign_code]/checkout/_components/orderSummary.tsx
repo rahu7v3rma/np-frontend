@@ -2,7 +2,7 @@
 
 import { Button, Card, CardBody, CardHeader, Divider } from '@nextui-org/react';
 import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { IoIosInformationCircle } from 'react-icons/io';
 
@@ -10,8 +10,12 @@ import InfoPopup from '@/app/[locale]/(navbar)/_components/infoPopup';
 import SharePopover from '@/app/[locale]/(navbar)/_components/sharePopover';
 import { CampaignContext } from '@/app/[locale]/context/campaign';
 import { CartContext } from '@/app/[locale]/context/cart';
+import { useSendEmail } from '@/hooks/useSendEmail';
 import { useCurrentLocale, useI18n } from '@/locales/client';
 import MultiSelectPrice from '@/shared/MultiSelectPrice';
+import { SendEmailProps } from '@/types/order';
+
+import SendEmail from './SendEmail';
 
 interface Props {
   giftPrice: number;
@@ -20,6 +24,7 @@ interface Props {
   submitDisabled?: boolean;
   onSubmit: () => void;
   productLinks?: boolean;
+  sendEmailValues: SendEmailProps;
 }
 
 export default function OrderSummary({
@@ -29,8 +34,11 @@ export default function OrderSummary({
   submitDisabled = false,
   onSubmit,
   productLinks = true,
+  sendEmailValues,
 }: Props) {
   const t = useI18n();
+  const pathname = usePathname();
+
   const currentLocale = useCurrentLocale();
   const { cart } = useContext(CartContext);
   const [shareLink, setShareLink] = useState('');
@@ -201,6 +209,7 @@ export default function OrderSummary({
           </div>
         </CardBody>
       </Card>
+      {pathname.includes('/checkout') && <SendEmail {...sendEmailValues} />}
       <div className="flex mt-6 gap-4">
         <SharePopover link={shareLink} />
         <Button
@@ -214,7 +223,7 @@ export default function OrderSummary({
             ? giftPrice > budget
               ? t('common.approveAndPay')
               : t('common.approve')
-            : t('button.continue')}s
+            : t('button.continue')}
         </Button>
       </div>
       {campaignDetails?.campaign_type !== 'WALLET' &&

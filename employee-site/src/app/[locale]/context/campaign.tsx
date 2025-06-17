@@ -62,11 +62,6 @@ export function CampaignWrapper({ children }: { children: ReactNode }) {
     fetchCampaignDetails();
   }, [fetchCampaignDetails, fetchCampaignType, campaignType]);
 
-  // Add useEffect to log campaign details
-  useEffect(() => {
-    console.log('CHECKOUT PAGE - Campaign Details:', campaignDetails);
-  }, [campaignDetails]);
-
   return (
     <CampaignContext.Provider
       value={{

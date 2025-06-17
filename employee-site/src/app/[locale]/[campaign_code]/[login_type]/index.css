@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind utilities;
+
+@layer utilities {
+
+  .mobile-logo {
+    width: 115px;
+    height: 57px;
+    margin-top: 40px;
+    background-image: url('/image/inactive-campaign/mobile-logo.svg');
+  }
+
+  .desktop-logo {
+    width: 154px;
+    height: 77px;
+    background-image: url('/image/inactive-campaign/desktop-logo.svg');
+  }
+}
